@@ -1,5 +1,5 @@
-import { useState, useCallback } from 'react';
-import questionsData from '@/assets/questions.json';
+import questionsData from "@/assets/questions.json";
+import { useCallback, useState } from "react";
 
 // Type definition for a card/question
 export interface Card {
@@ -43,7 +43,7 @@ const loadQuestionsFromDatabase = async (): Promise<Card[]> => {
   // Custom API:
   // const response = await fetch('https://api.example.com/questions');
   // return response.json();
-  
+
   // For now, return local JSON data
   return questionsData as Card[];
 };
@@ -55,13 +55,13 @@ const loadQuestionsFromDatabase = async (): Promise<Card[]> => {
 export const useCards = (): UseCardsReturn => {
   // Load questions from local JSON (or database in the future)
   const [questions] = useState<Card[]>(questionsData as Card[]);
-  
+
   // Track the current card being displayed
   const [currentCard, setCurrentCard] = useState<Card | null>(null);
-  
+
   // Track which cards have been used in this round
   const [usedCards, setUsedCards] = useState<number[]>([]);
-  
+
   // Discard pile for future functionality (e.g., removing cards from rotation)
   const [discardPile, setDiscardPile] = useState<number[]>([]);
 
@@ -132,5 +132,3 @@ export const useCards = (): UseCardsReturn => {
 };
 
 export default useCards;
-
-
