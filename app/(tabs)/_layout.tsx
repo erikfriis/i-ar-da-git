@@ -15,19 +15,40 @@ export default function TabLayout() {
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: false,
         tabBarButton: HapticTab,
+        tabBarStyle: {
+          backgroundColor: colorScheme === 'dark' ? '#1E293B' : '#FFFFFF',
+          borderTopColor: colorScheme === 'dark' ? '#334155' : '#E2E8F0',
+        },
       }}>
+      <Tabs.Screen
+        name="game"
+        options={{
+          title: 'Spel',
+          tabBarIcon: ({ color }) => (
+            <IconSymbol size={28} name="play.circle.fill" color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: 'Inställningar',
+          tabBarIcon: ({ color }) => (
+            <IconSymbol size={28} name="gearshape.fill" color={color} />
+          ),
+        }}
+      />
+      {/* Hide old tabs from navigation */}
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          href: null, // This hides the tab from navigation
         }}
       />
       <Tabs.Screen
         name="explore"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          href: null, // This hides the tab from navigation
         }}
       />
     </Tabs>
