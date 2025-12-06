@@ -31,7 +31,7 @@ type CardFace = "question" | "answer";
  * Displays the current question/answer with swipe interactions
  * - Front: Shows event text only
  * - Back: Shows full date (e.g., "17 juni 2025") with category color
- * 
+ *
  * After completing a card, ALWAYS returns to /game (Slumpa kategori screen)
  */
 export default function QuestionScreen() {
@@ -192,13 +192,6 @@ export default function QuestionScreen() {
             )}
           </Animated.View>
         </GestureDetector>
-
-        {/* Swipe hint */}
-        <Text style={styles.swipeHint}>
-          {cardFace === "question"
-            ? "Svep höger för att visa svaret →"
-            : "Svep höger för nästa kort →"}
-        </Text>
       </View>
 
       {/* Menu Modal - NO gameplay buttons */}
@@ -228,12 +221,6 @@ const styles = StyleSheet.create({
   },
   cardWrapper: {
     alignItems: "center",
-  },
-  swipeHint: {
-    marginTop: 24,
-    fontSize: 14,
-    color: "rgba(255, 255, 255, 0.6)",
-    fontStyle: "italic",
   },
   errorText: {
     fontSize: 18,
