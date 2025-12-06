@@ -74,9 +74,7 @@ export const GameCard: React.FC<GameCardProps> = ({
       <View style={[styles.card, styles.questionCard]}>
         {/* Category header */}
         {category && (
-          <View
-            style={[styles.categoryHeader, { backgroundColor: category.color }]}
-          >
+          <View style={[styles.categoryHeader]}>
             <Text style={styles.categoryLabel}>{category.label}</Text>
           </View>
         )}
@@ -89,14 +87,13 @@ export const GameCard: React.FC<GameCardProps> = ({
         {/* Footer with title and button */}
         <View style={styles.footer}>
           <Text style={styles.footerTitle}>i år då?</Text>
-
-          {buttonText && onButtonPress && (
-            <Pressable style={styles.button} onPress={onButtonPress}>
-              <Text style={styles.buttonText}>{buttonText}</Text>
-            </Pressable>
-          )}
         </View>
       </View>
+      {buttonText && onButtonPress && (
+        <Pressable style={styles.button} onPress={onButtonPress}>
+          <Text style={styles.buttonText}>{buttonText}</Text>
+        </Pressable>
+      )}
     </View>
   );
 };
@@ -110,25 +107,29 @@ const styles = StyleSheet.create({
     height: CARD_HEIGHT,
     borderRadius: 16,
     overflow: "hidden",
+    paddingVertical: 16,
+    paddingHorizontal: 36,
+    backgroundColor: "000000",
   },
   questionCard: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#000000",
   },
   categoryHeader: {
-    paddingVertical: 12,
+    paddingBottom: 16,
     paddingHorizontal: 16,
   },
   categoryLabel: {
-    fontSize: 14,
+    fontSize: 29,
     fontWeight: "600",
-    color: "#1F2937",
+    color: "#ffffff",
     textAlign: "center",
   },
   questionContent: {
     flex: 1,
-    justifyContent: "center",
+    justifyContent: "flex-start",
     paddingHorizontal: 20,
     paddingVertical: 16,
+    backgroundColor: "#ffffff",
   },
   eventText: {
     fontSize: 18,
@@ -143,9 +144,9 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   footerTitle: {
-    fontSize: 18,
+    fontSize: 46,
     fontWeight: "700",
-    color: "#1F2937",
+    color: "#ffffff",
   },
   answerContent: {
     flex: 1,
