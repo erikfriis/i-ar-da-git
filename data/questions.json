@@ -1,0 +1,492 @@
+[
+  {
+    "id": 1,
+    "category": "prylar",
+    "date": "21 maj",
+    "event": "Google lanserar Overview i Sverige som en inbyggd AI-funktion i Chrome.",
+    "answer": "2025"
+  },
+  {
+    "id": 2,
+    "category": "prylar",
+    "date": "19 januari",
+    "event": "Den kinesiska sociala medier-plattformen Tiktok stängs ner i USA.",
+    "answer": "2025"
+  },
+  {
+    "id": 3,
+    "category": "prylar",
+    "date": "23 januari",
+    "event": "Thailand legaliserar samkönade äktenskap och över 1 800 par gifter sig direkt.",
+    "answer": "2025"
+  },
+  {
+    "id": 4,
+    "category": "prylar",
+    "date": "14 april",
+    "event": "Katy Perry och fem andra kvinnor genomför en elva minuters tyngdlös rymdfärd med Blue Orbit.",
+    "answer": "2025"
+  },
+  {
+    "id": 5,
+    "category": "prylar",
+    "date": "17 juni",
+    "event": "Bella Nilsson döms till fängelse för sin inblandning i Think Pink-skandalen.",
+    "answer": "2025"
+  },
+  {
+    "id": 6,
+    "category": "prylar",
+    "date": "29 oktober",
+    "event": "Datachipföretaget Nvidia först i världen med att nå ett marknadsvärde på fem biljoner dollar.",
+    "answer": "2025"
+  },
+  {
+    "id": 7,
+    "category": "prylar",
+    "date": "5 november",
+    "event": "SVT varnar för farliga gifthalter i piratkopior av den populära Labubu-dockan.",
+    "answer": "2025"
+  },
+  {
+    "id": 8,
+    "category": "personer",
+    "date": "6 januari",
+    "event": "Kanadas premiärminister, Justin Trudeau, meddelar att han avgår efter nio år på posten.",
+    "answer": "2025"
+  },
+  {
+    "id": 9,
+    "category": "personer",
+    "date": "7 januari",
+    "event": "En stor brand bryter ut i Los Angeles och orsakar omfattande skador.",
+    "answer": "2025"
+  },
+  {
+    "id": 10,
+    "category": "personer",
+    "date": "20 januari",
+    "event": "Donald Trump svärs in som USA:s 47:e president för sin andra mandatperiod.",
+    "answer": "2025"
+  },
+  {
+    "id": 11,
+    "category": "personer",
+    "date": "26 januari",
+    "event": "En undervattenskabel mellan Gotland och Lettland skadas och ett Maltaregistrerat fartyg tas i beslag, misstänkt för sabotage.",
+    "answer": "2025"
+  },
+  {
+    "id": 12,
+    "category": "personer",
+    "date": "4 februari",
+    "event": "En skjutning på Risbergska skolan i Örebro kräver flera dödsoffer och skakar om landet.",
+    "answer": "2025"
+  },
+  {
+    "id": 13,
+    "category": "personer",
+    "date": "7 februari",
+    "event": "Prinsessan Ines föds på Danderyds sjukhus, dotter till prins Carls Philip och prinsessan Sofia.",
+    "answer": "2025"
+  },
+  {
+    "id": 14,
+    "category": "personer",
+    "date": "11 mars",
+    "event": "Filippinernas ex-president Rodrigo Duterte fängslas för brott mot mänskligheten för sin inblandning i 74 mord mellan 2013 och 2018.",
+    "answer": "2025"
+  },
+  {
+    "id": 15,
+    "category": "personer",
+    "date": "18 mars",
+    "event": "Två NASA-astronauter återvänder efter nio månader i rymden, åtta månader och två veckor längre än planerat.",
+    "answer": "2025"
+  },
+  {
+    "id": 16,
+    "category": "personer",
+    "date": "24 mars",
+    "event": "Pete Hegseths sms om stridsplaner i Jemen offentliggörs av The Atlantic.",
+    "answer": "2025"
+  },
+  {
+    "id": 17,
+    "category": "personer",
+    "date": "3 april",
+    "event": "Donald Trump hotar EU med 50 procent i tullar på den egenägda plattformen Truth Social.",
+    "answer": "2025"
+  },
+  {
+    "id": 18,
+    "category": "personer",
+    "date": "21 april",
+    "event": "Påve Franciskus, 88, avlider efter tolv år som katolska kyrkans ledare.",
+    "answer": "2025"
+  },
+  {
+    "id": 19,
+    "category": "personer",
+    "date": "28 april",
+    "event": "Johan Pehrson meddelar att han avgår som partiledare för Liberalerna.",
+    "answer": "2025"
+  },
+  {
+    "id": 20,
+    "category": "personer",
+    "date": "3 maj",
+    "event": "Anna-Karin Hatt väljs till ny partiledare för Centerpartiet.",
+    "answer": "2025"
+  },
+  {
+    "id": 21,
+    "category": "personer",
+    "date": "7 juni",
+    "event": "Trump beordrar att 2 000 National Guard-soldater sätts in i Kalifornien för att stävja demonstranter under ICE-protester.",
+    "answer": "2025"
+  },
+  {
+    "id": 22,
+    "category": "personer",
+    "date": "9 juni",
+    "event": "Freedom Flotilla Madleen stoppas av Israel och människorättsaktivister och volontärer, däribland Greta Thunberg, grips.",
+    "answer": "2025"
+  },
+  {
+    "id": 23,
+    "category": "personer",
+    "date": "24 juni",
+    "event": "Bankrånaren Clark Olofsson avlider, 78 år gammal.",
+    "answer": "2025"
+  },
+  {
+    "id": 24,
+    "category": "personer",
+    "date": "4 juli",
+    "event": "Den svenske gängledaren Ismail Abdo, mer känd som Jordgubben, grips i Turkiet.",
+    "answer": "2025"
+  },
+  {
+    "id": 25,
+    "category": "personer",
+    "date": "18 juli",
+    "event": "Företagsledaren Percy Barnevik avlider, 84 år gammal.",
+    "answer": "2025"
+  },
+  {
+    "id": 26,
+    "category": "personer",
+    "date": "2 september",
+    "event": "USA genomför det första av totalt X dödliga tillslag mot misstänkt knarksmuggling på internationellt vatten.",
+    "answer": "2025"
+  },
+  {
+    "id": 27,
+    "category": "personer",
+    "date": "10 september",
+    "event": "Charlie Kirk mördas under en debatt på ett campus i Utah.",
+    "answer": "2025"
+  },
+  {
+    "id": 28,
+    "category": "personer",
+    "date": "7 september",
+    "event": "Carlo Acutis blir den första helgonförklarade personen som tillhör millenniegenerationen.",
+    "answer": "2025"
+  },
+  {
+    "id": 29,
+    "category": "personer",
+    "date": "8 september",
+    "event": "Gen Z-protesterna i Nepal leder till att tidigare bannade sociala medier öppnas igen.",
+    "answer": "2025"
+  },
+  {
+    "id": 30,
+    "category": "personer",
+    "date": "21 september",
+    "event": "Svenska kyrkan går till kyrkoval.",
+    "answer": "2025"
+  },
+  {
+    "id": 31,
+    "category": "personer",
+    "date": "25 september",
+    "event": "Frankrikes ex-president, Nicolas Sarkozy, döms till fem års fängelse för korruption kopplad till Libyen-affären.",
+    "answer": "2025"
+  },
+  {
+    "id": 32,
+    "category": "personer",
+    "date": "8 oktober",
+    "event": "Israel och Hamas tar ett första steg mot ett begränsat eldupphör i Gaza.",
+    "answer": "2025"
+  },
+  {
+    "id": 33,
+    "category": "personer",
+    "date": "12 oktober",
+    "event": "Madagaskars president Andry Rajoelina flyr landet när delar av militären ansluter till protesterna.",
+    "answer": "2025"
+  },
+  {
+    "id": 34,
+    "category": "personer",
+    "date": "15 oktober",
+    "event": "Anna-Karin Hatt meddelar att hon lämnar posten som partiledare för Centerpartiet.",
+    "answer": "2025"
+  },
+  {
+    "id": 35,
+    "category": "personer",
+    "date": "19 oktober",
+    "event": "Gärningsmän utklädda till byggarbetare stjäl smycken värda över 100 miljoner dollar på Louvren i Paris.",
+    "answer": "2025"
+  },
+  {
+    "id": 36,
+    "category": "personer",
+    "date": "22 oktober",
+    "event": "Ukrainas president Volodymyr Zelenskyj besöker Linköping för samtal om luftförsvaret och eventuella inköp av Jas-plan.",
+    "answer": "2025"
+  },
+  {
+    "id": 37,
+    "category": "personer",
+    "date": "30 oktober",
+    "event": "Det brittiska hovet meddelar att prins Andrew fråntas sin kungliga titel på grund av kopplingar till Epstein.",
+    "answer": "2025"
+  },
+  {
+    "id": 38,
+    "category": "underhallning",
+    "date": "15 januari",
+    "event": "Regissören och manusförfattaren David Lynch avlider, 78 år gammal.",
+    "answer": "2025"
+  },
+  {
+    "id": 39,
+    "category": "underhallning",
+    "date": "30 januari",
+    "event": "Bingolottos tidigare programledare, Leif Loket Olsson avlider, 82 år gammal.",
+    "answer": "2025"
+  },
+  {
+    "id": 40,
+    "category": "underhallning",
+    "date": "18 februari",
+    "event": "Skådespelaren Gene Hackman avlider, 95 år gammal.",
+    "answer": "2025"
+  },
+  {
+    "id": 41,
+    "category": "underhallning",
+    "date": "18 april",
+    "event": "Teaterregissören och dramatikern Stina Oscarson avlider, 49 år gammal.",
+    "answer": "2025"
+  },
+  {
+    "id": 42,
+    "category": "underhallning",
+    "date": "3 maj",
+    "event": "Lady Gaga gör den största konsert som en kvinnlig artist hållit med 2,5 miljoner i publiken i Rio de Janeiro.",
+    "answer": "2025"
+  },
+  {
+    "id": 43,
+    "category": "underhallning",
+    "date": "4 maj",
+    "event": "Livestreamen av den stora älgvandringen avslutas efter 478 timmar när älgarna slutligen korsat Ångermanälven.",
+    "answer": "2025"
+  },
+  {
+    "id": 44,
+    "category": "underhallning",
+    "date": "12 maj",
+    "event": "Rockbandet Foo Fighters sparkar trummisen Josh Freese efter två år i bandet.",
+    "answer": "2025"
+  },
+  {
+    "id": 45,
+    "category": "underhallning",
+    "date": "20 maj",
+    "event": "Ljudteknikern och ABBA-producenten Michael B. Tretow avlider, 80 år gammal.",
+    "answer": "2025"
+  },
+  {
+    "id": 46,
+    "category": "underhallning",
+    "date": "30 maj",
+    "event": "Popartisten Taylor Swift köper tillbaka hela sin låtkatalog.",
+    "answer": "2025"
+  },
+  {
+    "id": 47,
+    "category": "underhallning",
+    "date": "17 juni",
+    "event": "Jurassic World: Rebirth har världspremiär i London.",
+    "answer": "2025"
+  },
+  {
+    "id": 48,
+    "category": "underhallning",
+    "date": "4 juli",
+    "event": "Oasis inleder sin återföreningsturné i Cardiff.",
+    "answer": "2025"
+  },
+  {
+    "id": 49,
+    "category": "underhallning",
+    "date": "9 juli",
+    "event": "Nattklubben Trädgården i Stockholm överklagar beslutet om att riva deras bygglov.",
+    "answer": "2025"
+  },
+  {
+    "id": 50,
+    "category": "underhallning",
+    "date": "17 juli",
+    "event": "Björn Skifs meddelar att han avslutar sin artistkarriär efter en demensdiagnos.",
+    "answer": "2025"
+  },
+  {
+    "id": 51,
+    "category": "underhallning",
+    "date": "17 juli",
+    "event": "CBS meddelar att The Late Show med Stephen Colbert kommer att läggas ner.",
+    "answer": "2025"
+  },
+  {
+    "id": 52,
+    "category": "underhallning",
+    "date": "22 juli",
+    "event": "Hårdrockslegendaren Ozzy Osbourne avlider, 76 år gammal.",
+    "answer": "2025"
+  },
+  {
+    "id": 53,
+    "category": "underhallning",
+    "date": "24 juli",
+    "event": "Wrestlingprofilen Hulk Hogan avlider, 71 år gammal.",
+    "answer": "2025"
+  },
+  {
+    "id": 54,
+    "category": "underhallning",
+    "date": "11 augusti",
+    "event": "Den fiktionella gruppen HUNTR/X blir första gruppen bestående av enbart kvinnliga medlemmar på 24 år att toppa Billboard Hot 100 med låten Golden.",
+    "answer": "2025"
+  },
+  {
+    "id": 55,
+    "category": "underhallning",
+    "date": "4 september",
+    "event": "Modeskaparen Giorgio Armani avlider, 91 år gammal.",
+    "answer": "2025"
+  },
+  {
+    "id": 56,
+    "category": "underhallning",
+    "date": "22 september",
+    "event": "Disney pausar Jimmy Kimmel Live efter vad de anser vara kontroversiella skämt.",
+    "answer": "2025"
+  },
+  {
+    "id": 57,
+    "category": "underhallning",
+    "date": "26 september",
+    "event": "Riyadh Comedy Festival drar igång trots omfattande västerlig kritik riktad mot festivalens dragplåster.",
+    "answer": "2025"
+  },
+  {
+    "id": 58,
+    "category": "underhallning",
+    "date": "1 oktober",
+    "event": "Zoologen och shimpansexperten Jane Goodall avlider, 91 år gammal.",
+    "answer": "2025"
+  },
+  {
+    "id": 59,
+    "category": "underhallning",
+    "date": "3 oktober",
+    "event": "Sean \"Diddy\" Combs döms till fyra år och två månaders fängelse för trafficking.",
+    "answer": "2025"
+  },
+  {
+    "id": 60,
+    "category": "underhallning",
+    "date": "14 oktober",
+    "event": "Sångaren och musikern D'Angelo avlider, 51 år gammal.",
+    "answer": "2025"
+  },
+  {
+    "id": 61,
+    "category": "underhallning",
+    "date": "17 oktober",
+    "event": "Skådespelaren Jacob Ericksson avlider, 58 år gammal.",
+    "answer": "2025"
+  },
+  {
+    "id": 62,
+    "category": "underhallning",
+    "date": "10 november",
+    "event": "Zara Larsson nomineras till en amerikansk Grammy.",
+    "answer": "2025"
+  },
+  {
+    "id": 63,
+    "category": "blandat",
+    "date": "17 januari",
+    "event": "Återuppbyggnaden av vattenlandet Oceana i Göteborg påbörjas på nytt.",
+    "answer": "2025"
+  },
+  {
+    "id": 64,
+    "category": "blandat",
+    "date": "6 april",
+    "event": "Alex Ovetjkin passerar Wayne Gretzky och sätter nytt NHL-målrekord med sitt 895:e mål.",
+    "answer": "2025"
+  },
+  {
+    "id": 65,
+    "category": "blandat",
+    "date": "25 maj",
+    "event": "Lando Norris vinner Monacos Grand Prix för McLaren.",
+    "answer": "2025"
+  },
+  {
+    "id": 66,
+    "category": "blandat",
+    "date": "27 juli",
+    "event": "EM i damfotboll spelas i Schweiz och England lyckas försvara sitt guld.",
+    "answer": "2025"
+  },
+  {
+    "id": 67,
+    "category": "blandat",
+    "date": "1 september",
+    "event": "Alexander Isak blir Premier Leagues dyraste spelare någonsin när han säljs för 1,65 miljarder kronor.",
+    "answer": "2025"
+  },
+  {
+    "id": 68,
+    "category": "blandat",
+    "date": "6 september",
+    "event": "Max Verstappen sätter nytt F1-rekord med tiden 1.18,792 på Monza, Italien.",
+    "answer": "2025"
+  },
+  {
+    "id": 69,
+    "category": "blandat",
+    "date": "15 september",
+    "event": "Armand Duplantis höjer världsrekordet för fjärde gången i år genom att klara 6,30 meter.",
+    "answer": "2025"
+  },
+  {
+    "id": 70,
+    "category": "blandat",
+    "date": "9 november",
+    "event": "Mjällby tar hem Allsvenskan och slår nytt poängrekord med totalt 75 poäng.",
+    "answer": "2025"
+  }
+]
