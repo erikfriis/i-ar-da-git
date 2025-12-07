@@ -8,29 +8,25 @@ import { useGame } from "@/context/GameContext";
 
 /**
  * Category Selection Screen - "Slumpa kategori"
- * 
+ *
  * 6 possible outcomes (1/6 each):
- * - gul → prylar category
- * - blå → personer category
- * - lila → underhållning category
- * - grön → blandat category
- * - svart → user picks category
- * - vit → user picks category
+ * - Yellow (prylar) → category result screen
+ * - Blue (personer) → category result screen
+ * - Purple (underhållning) → category result screen
+ * - Green (blandat) → category result screen
+ * - White (vit) → choose category (user picks)
+ * - Black (svart) → choose category (opponent picks)
  */
 export default function CategoryScreen() {
   const router = useRouter();
   const {
     drawRandomOutcome,
-    selectCategoryById,
-    drawRandomQuestion,
     getDiscardCount,
     endGame,
     areAllQuestionsUsed,
   } = useGame();
 
-  // Get discard count value
   const discardCount = getDiscardCount;
-
   const [menuVisible, setMenuVisible] = useState(false);
 
   /**
@@ -41,18 +37,17 @@ export default function CategoryScreen() {
     const result = drawRandomOutcome();
 
     if (result.type === "choose") {
-      // svart or vit outcome → navigate to choose category screen
-      router.push("/game/choose-category");
+      // White or Black → navigate to choose category screen with mode
+      router.push({
+        pathname: "/game/choose-category",
+        params: { mode: result.mode },
+      });
     } else {
-      // Direct category outcome → set category and draw question
-      selectCategoryById(result.categoryId);
-      const question = drawRandomQuestion(result.categoryId);
-
-      if (question) {
-        router.push("/game/question");
-      } else {
-        alert("Inga fler frågor i denna kategori!");
-      }
+      // Colored category → navigate to category result screen
+      router.push({
+        pathname: "/game/category-result",
+        params: { categoryId: result.categoryId },
+      });
     }
   };
 

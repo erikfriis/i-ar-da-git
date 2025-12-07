@@ -1,0 +1,33 @@
+[
+  {
+    "id": 1,
+    "title": "Förberedelser",
+    "text": "Samla alla spelare runt bordet. En spelare startar spelet genom att trycka på Starta spel. Bestäm vem som börjar läsa frågorna."
+  },
+  {
+    "id": 2,
+    "title": "Slumpa kategori",
+    "text": "Tryck på Slumpa kategori för att få en slumpad kategori. Färgerna representerar olika typer av frågor."
+  },
+  {
+    "id": 3,
+    "title": "Svart och vitt",
+    "text": "Om resultatet blir vitt får spelaren välja kategori själv. Om resultatet blir svart väljer motståndaren vilken kategori som ska spelas."
+  },
+  {
+    "id": 4,
+    "title": "Spela kortet",
+    "text": "Läs frågan högt. Alla gissar vilket år händelsen inträffade. När alla gissat vänds kortet för att visa svaret."
+  },
+  {
+    "id": 5,
+    "title": "Slänghögen",
+    "text": "Efter varje kort hamnar det i slänghögen. Där kan ni bläddra tillbaka och se vilka kort som redan spelats."
+  },
+  {
+    "id": 6,
+    "title": "Slänghögen",
+    "text": "Efter varje kort hamnar det i slänghögen. Där kan ni bläddra tillbaka och se vilka kort som redan spelats."
+  }
+]
+

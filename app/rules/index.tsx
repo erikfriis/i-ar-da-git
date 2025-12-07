@@ -1,74 +1,128 @@
-import React from "react";
-import { View, Text, StyleSheet, Pressable, ScrollView } from "react-native";
 import { useRouter } from "expo-router";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import React, { useState } from "react";
+import {
+  Dimensions,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+
+import rulesData from "@/data/rules.json";
 
 /**
- * Rules Screen - Placeholder
+ * Rule step data structure
+ */
+interface RuleStep {
+  id: number;
+  title: string;
+  text: string;
+}
+
+const rules: RuleStep[] = rulesData;
+const TOTAL_STEPS = rules.length;
+
+const { width: SCREEN_WIDTH } = Dimensions.get("window");
+const CARD_WIDTH = Math.min(SCREEN_WIDTH * 0.85, 320);
+const CARD_HEIGHT = CARD_WIDTH * 1.5;
+
+/**
+ * Rules Screen
+ * Displays game rules as step-based cards matching the game card design
+ * 
+ * - 5 steps total
+ * - Navigation with "nästa" / "föregående" buttons
+ * - Close icon in top right
+ * - Always starts at step 1
+ * - No state persistence between opens
  */
 export default function RulesScreen() {
   const router = useRouter();
-  const insets = useSafeAreaInsets();
+  const [currentStep, setCurrentStep] = useState(1);
+
+  const currentRule = rules.find((r) => r.id === currentStep) || rules[0];
+  const isFirstStep = currentStep === 1;
+  const isLastStep = currentStep === TOTAL_STEPS;
 
   /**
-   * Navigate back
+   * Go to previous step
    */
-  const handleBack = () => {
+  const handlePrevious = () => {
+    if (!isFirstStep) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  /**
+   * Go to next step or close on last step
+   */
+  const handleNext = () => {
+    if (isLastStep) {
+      router.back();
+    } else {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  /**
+   * Close the rules screen
+   */
+  const handleClose = () => {
     router.back();
   };
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top + 12 }]}>
-      {/* Header */}
+    <View style={styles.container}>
+      {/* Close button in top right */}
       <View style={styles.header}>
-        <Pressable style={styles.backButton} onPress={handleBack} hitSlop={12}>
-          <Text style={styles.backButtonText}>← Tillbaka</Text>
+        <Pressable style={styles.closeButton} onPress={handleClose}>
+          <Text style={styles.closeIcon}>✕</Text>
         </Pressable>
       </View>
 
-      {/* Content */}
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.content}
-      >
-        <View style={styles.titleCard}>
-          <Text style={styles.title}>Spelregler</Text>
+      {/* Main content */}
+      <View style={styles.content}>
+        {/* Rule Card - matching game card design */}
+        <View style={styles.cardContainer}>
+          <View style={styles.card}>
+            {/* Title header */}
+            <View style={styles.titleHeader}>
+              <Text style={styles.titleText}>{currentRule.title}</Text>
+            </View>
+
+            {/* White content area */}
+            <View style={styles.cardContent}>
+              <Text style={styles.ruleText}>{currentRule.text}</Text>
+            </View>
+
+            {/* Footer with "i år då?" and step indicator */}
+            <View style={styles.footer}>
+              <Text style={styles.footerTitle}>i år då?</Text>
+              <Text style={styles.stepIndicator}>
+                {currentStep}/{TOTAL_STEPS}
+              </Text>
+            </View>
+          </View>
         </View>
 
-        <View style={styles.rulesCard}>
-          <Text style={styles.ruleTitle}>Så spelar du:</Text>
+        {/* Navigation buttons */}
+        <View style={styles.buttonContainer}>
+          {!isFirstStep && (
+            <Pressable style={styles.navButton} onPress={handlePrevious}>
+              <Text style={styles.navButtonText}>föregående</Text>
+            </Pressable>
+          )}
 
-          <Text style={styles.ruleText}>
-            1. Tryck på "Slumpa kategori" för att dra ett kort
-          </Text>
-
-          <Text style={styles.ruleText}>
-            2. Läs frågan och gissa vilket år händelsen inträffade
-          </Text>
-
-          <Text style={styles.ruleText}>
-            3. Svep höger eller tryck "vänd kort" för att se svaret
-          </Text>
-
-          <Text style={styles.ruleText}>
-            4. Svep igen eller tryck "nytt kort" för att fortsätta
-          </Text>
-
-          <Text style={styles.ruleText}>
-            5. Alla spelade kort hamnar i slänghögen
-          </Text>
+          <Pressable
+            style={[styles.navButton, styles.primaryButton]}
+            onPress={handleNext}
+          >
+            <Text style={styles.navButtonText}>
+              {isLastStep ? "stäng" : "nästa"}
+            </Text>
+          </Pressable>
         </View>
-
-        <View style={styles.tipsCard}>
-          <Text style={styles.ruleTitle}>Tips:</Text>
-          <Text style={styles.ruleText}>
-            • Spela tillsammans och tävla om vem som gissar närmast!
-          </Text>
-          <Text style={styles.ruleText}>
-            • Använd menyn (☰) för att pausa eller avsluta spelet
-          </Text>
-        </View>
-      </ScrollView>
+      </View>
     </View>
   );
 }
@@ -79,65 +133,107 @@ const styles = StyleSheet.create({
     backgroundColor: "#D24662",
   },
   header: {
-    paddingHorizontal: 16,
-    paddingBottom: 8,
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    paddingHorizontal: 20,
+    paddingTop: 60,
+    paddingBottom: 10,
   },
-  backButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 4,
+  closeButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "rgba(0, 0, 0, 0.3)",
+    justifyContent: "center",
+    alignItems: "center",
   },
-  backButtonText: {
-    fontSize: 16,
-    fontWeight: "600",
+  closeIcon: {
+    fontSize: 18,
     color: "#FFFFFF",
-  },
-  scrollView: {
-    flex: 1,
+    fontWeight: "600",
   },
   content: {
+    flex: 1,
+    justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 24,
-    paddingTop: 24,
     paddingBottom: 40,
   },
-  titleCard: {
-    backgroundColor: "#1E1E1E",
-    paddingHorizontal: 40,
-    paddingVertical: 24,
-    borderRadius: 16,
+  cardContainer: {
+    alignItems: "center",
     marginBottom: 24,
   },
-  title: {
-    fontSize: 28,
-    fontWeight: "800",
-    color: "#FFFFFF",
-  },
-  rulesCard: {
-    backgroundColor: "rgba(0, 0, 0, 0.2)",
+  card: {
+    width: CARD_WIDTH,
+    height: CARD_HEIGHT,
     borderRadius: 16,
-    padding: 20,
-    width: "100%",
-    maxWidth: 340,
-    marginBottom: 16,
+    backgroundColor: "#000000",
+    overflow: "hidden",
+    paddingVertical: 16,
+    paddingHorizontal: 20,
   },
-  tipsCard: {
-    backgroundColor: "rgba(0, 0, 0, 0.2)",
-    borderRadius: 16,
-    padding: 20,
-    width: "100%",
-    maxWidth: 340,
+  titleHeader: {
+    paddingBottom: 16,
+    paddingHorizontal: 16,
   },
-  ruleTitle: {
-    fontSize: 18,
+  titleText: {
+    fontSize: 26,
     fontWeight: "700",
     color: "#FFFFFF",
-    marginBottom: 16,
+    textAlign: "center",
+  },
+  cardContent: {
+    flex: 1,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 8,
+    paddingHorizontal: 20,
+    paddingVertical: 24,
+    justifyContent: "center",
   },
   ruleText: {
-    fontSize: 15,
+    fontSize: 17,
+    fontWeight: "500",
+    color: "#1F2937",
+    textAlign: "center",
+    lineHeight: 26,
+  },
+  footer: {
+    paddingTop: 16,
+    paddingBottom: 8,
+    alignItems: "center",
+    position: "relative",
+  },
+  footerTitle: {
+    fontSize: 42,
+    fontWeight: "700",
     color: "#FFFFFF",
-    marginBottom: 12,
-    lineHeight: 22,
+  },
+  stepIndicator: {
+    position: "absolute",
+    right: 0,
+    bottom: 8,
+    fontSize: 14,
+    fontWeight: "600",
+    color: "rgba(255, 255, 255, 0.6)",
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 12,
+  },
+  navButton: {
+    backgroundColor: "rgba(0, 0, 0, 0.3)",
+    paddingHorizontal: 28,
+    paddingVertical: 14,
+    borderRadius: 8,
+  },
+  primaryButton: {
+    backgroundColor: "#2563EB",
+  },
+  navButtonText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "600",
   },
 });
-
