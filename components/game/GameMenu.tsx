@@ -46,18 +46,12 @@ export const GameMenu: React.FC<GameMenuProps> = ({
           <Text style={styles.menuTitle}>meny</Text>
 
           <View style={styles.menuItems}>
-            {/* Rules - disabled placeholder */}
+            {/* Rules - active */}
             <Pressable
-              style={[
-                styles.menuButton,
-                styles.greenButton,
-                styles.disabledButton,
-              ]}
+              style={[styles.menuButton, styles.greenButton]}
               onPress={onRules}
             >
-              <Text style={[styles.menuButtonText, styles.disabledText]}>
-                regler
-              </Text>
+              <Text style={styles.menuButtonText}>regler</Text>
             </Pressable>
 
             {/* Settings - disabled placeholder */}

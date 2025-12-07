@@ -1,10 +1,11 @@
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
 import { Dimensions, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { GameHeader } from "@/components/game/GameHeader";
 import { GameMenu } from "@/components/game/GameMenu";
-import { categories } from "@/constants/categories";
+import { LowCardsPopup } from "@/components/game/LowCardsPopup";
+import { categories, getCategoryById } from "@/constants/categories";
 import { useGame } from "@/context/GameContext";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
@@ -13,43 +14,75 @@ const GRID_GAP = 16;
 const SQUARE_SIZE = (SCREEN_WIDTH - GRID_PADDING * 2 - GRID_GAP) / 2;
 
 /**
- * Choose Category Screen - "Svart eller Vitt"
- * Shown when the random outcome is "svart" or "vit"
+ * Choose Category Screen
+ * Shown when outcome is "vit" (user chooses) or "svart" (opponent chooses)
  * User manually picks a category from a 2x2 grid
- * 
- * After selecting, navigates to /game/question
- * No state persists - next card will go through "Slumpa kategori" again
  */
 export default function ChooseCategoryScreen() {
   const router = useRouter();
+  const params = useLocalSearchParams<{ mode: string }>();
+  const mode = (params.mode as "user" | "opponent") || "user";
+
   const {
     selectCategoryById,
     drawRandomQuestion,
+    getRemainingCards,
+    needsReshuffle,
+    resetUsedQuestionsForCategory,
     getDiscardCount,
     endGame,
   } = useGame();
 
   const [menuVisible, setMenuVisible] = useState(false);
+  const [showLowCardsPopup, setShowLowCardsPopup] = useState(false);
+  const [pendingCategoryId, setPendingCategoryId] = useState<string | null>(
+    null
+  );
+
   const discardCount = getDiscardCount;
+
+  // Title based on mode
+  const title = mode === "opponent" ? "Motståndaren väljer" : "Du väljer";
+  const subtitle = "kategori";
 
   /**
    * Handle category selection
-   * Sets category, draws question, navigates to question screen
    */
   const handleSelectCategory = (categoryId: string) => {
-    // Set the selected category
-    selectCategoryById(categoryId);
+    // Check if category needs reshuffling
+    if (needsReshuffle(categoryId)) {
+      setPendingCategoryId(categoryId);
+      setShowLowCardsPopup(true);
+      return;
+    }
 
-    // Draw a random question from this category
+    proceedWithCategory(categoryId);
+  };
+
+  /**
+   * Proceed with category selection
+   */
+  const proceedWithCategory = (categoryId: string) => {
+    selectCategoryById(categoryId);
     const question = drawRandomQuestion(categoryId);
 
     if (question) {
-      // Navigate to question screen
       router.push("/game/question");
     } else {
-      // No questions available in this category
       alert("Inga fler frågor i denna kategori!");
     }
+  };
+
+  /**
+   * Handle low cards popup confirmation
+   */
+  const handleLowCardsConfirm = () => {
+    if (!pendingCategoryId) return;
+
+    setShowLowCardsPopup(false);
+    resetUsedQuestionsForCategory(pendingCategoryId);
+    proceedWithCategory(pendingCategoryId);
+    setPendingCategoryId(null);
   };
 
   /**
@@ -78,6 +111,11 @@ export default function ChooseCategoryScreen() {
     router.push("/settings");
   };
 
+  // Get category name for popup
+  const pendingCategory = pendingCategoryId
+    ? getCategoryById(pendingCategoryId)
+    : null;
+
   return (
     <View style={styles.container}>
       {/* Header */}
@@ -90,9 +128,9 @@ export default function ChooseCategoryScreen() {
       {/* Title */}
       <View style={styles.titleContainer}>
         <View style={styles.titleCard}>
-          <Text style={styles.titleText}>Svart eller vitt!</Text>
+          <Text style={styles.titleText}>{title}</Text>
+          <Text style={styles.subtitleText}>{subtitle}</Text>
         </View>
-        <Text style={styles.subtitle}>Välj kategori</Text>
       </View>
 
       {/* Category Grid - 2x2 */}
@@ -156,6 +194,13 @@ export default function ChooseCategoryScreen() {
         onEndGame={handleEndGame}
         onContinue={() => setMenuVisible(false)}
       />
+
+      {/* Low Cards Popup */}
+      <LowCardsPopup
+        visible={showLowCardsPopup}
+        categoryName={pendingCategory?.label || ""}
+        onConfirm={handleLowCardsConfirm}
+      />
     </View>
   );
 }
@@ -172,19 +217,20 @@ const styles = StyleSheet.create({
   titleCard: {
     backgroundColor: "#1E1E1E",
     paddingHorizontal: 32,
-    paddingVertical: 16,
+    paddingVertical: 20,
     borderRadius: 12,
-    marginBottom: 12,
+    alignItems: "center",
   },
   titleText: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: "800",
     color: "#FFFFFF",
   },
-  subtitle: {
+  subtitleText: {
     fontSize: 18,
     fontWeight: "600",
-    color: "rgba(255, 255, 255, 0.8)",
+    color: "rgba(255, 255, 255, 0.7)",
+    marginTop: 4,
   },
   gridContainer: {
     flex: 1,
@@ -204,7 +250,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: 16,
-    // Shadow
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,

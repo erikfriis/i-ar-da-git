@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import { Dimensions, StyleSheet, Text, View } from "react-native";
 import {
   Gesture,
@@ -17,6 +17,7 @@ import Animated, {
 import { GameCard } from "@/components/game/GameCard";
 import { GameHeader } from "@/components/game/GameHeader";
 import { GameMenu } from "@/components/game/GameMenu";
+import { LowCardsPopup } from "@/components/game/LowCardsPopup";
 import { useGame } from "@/context/GameContext";
 import { getFullAnswerDate } from "@/hooks/useGameEngine";
 
@@ -29,10 +30,9 @@ type CardFace = "question" | "answer";
 /**
  * Question Screen
  * Displays the current question/answer with swipe interactions
- * - Front: Shows event text only
- * - Back: Shows full date (e.g., "17 juni 2025") with category color
  *
- * After completing a card, ALWAYS returns to /game (Slumpa kategori screen)
+ * IMPORTANT: When completing a card, checks if category needs reshuffling
+ * BEFORE navigating back to /game. Popup appears here, not on Slumpa screen.
  */
 export default function QuestionScreen() {
   const router = useRouter();
@@ -41,6 +41,8 @@ export default function QuestionScreen() {
     currentCategory,
     completeCurrentQuestion,
     getDiscardCount,
+    needsReshuffle,
+    resetUsedQuestionsForCategory,
     endGame,
   } = useGame();
 
@@ -49,6 +51,10 @@ export default function QuestionScreen() {
 
   const [cardFace, setCardFace] = useState<CardFace>("question");
   const [menuVisible, setMenuVisible] = useState(false);
+  const [showLowCardsPopup, setShowLowCardsPopup] = useState(false);
+
+  // Store category info for popup (since completeCurrentQuestion clears it)
+  const pendingCategoryRef = useRef<{ id: string; label: string } | null>(null);
 
   // Animation values
   const translateX = useSharedValue(0);
@@ -63,14 +69,55 @@ export default function QuestionScreen() {
 
   /**
    * Handle completing the card and going back to main game screen
-   * ALWAYS navigates to /game (Slumpa kategori), NOT to choose-category
+   * Checks for reshuffle BEFORE navigating
    */
   const handleComplete = useCallback(() => {
+    if (!currentCategory || !currentQuestion) return;
+
+    // Store category info BEFORE completing (as completeCurrentQuestion clears it)
+    const categoryId = currentCategory.id;
+    const categoryLabel = currentCategory.label;
+    pendingCategoryRef.current = { id: categoryId, label: categoryLabel };
+
+    // Complete the question (marks as used, adds to discard pile, clears current)
     completeCurrentQuestion();
-    // Use replace to go back to the main game screen
-    // This prevents the loop back to choose-category
+
+    // Check if this category now needs reshuffling (< 5 cards remaining)
+    if (needsReshuffle(categoryId)) {
+      // Show popup - navigation will happen after user confirms
+      setShowLowCardsPopup(true);
+    } else {
+      // No reshuffle needed, navigate directly
+      pendingCategoryRef.current = null;
+      router.replace("/game");
+    }
+  }, [
+    currentCategory,
+    currentQuestion,
+    completeCurrentQuestion,
+    needsReshuffle,
+    router,
+  ]);
+
+  /**
+   * Handle low cards popup confirmation
+   * Reshuffle the category, then navigate
+   */
+  const handleLowCardsConfirm = useCallback(() => {
+    const pendingCategory = pendingCategoryRef.current;
+
+    if (pendingCategory) {
+      // Reset used questions for this specific category
+      resetUsedQuestionsForCategory(pendingCategory.id);
+    }
+
+    // Clear the ref and popup
+    pendingCategoryRef.current = null;
+    setShowLowCardsPopup(false);
+
+    // Now navigate to /game
     router.replace("/game");
-  }, [completeCurrentQuestion, router]);
+  }, [resetUsedQuestionsForCategory, router]);
 
   /**
    * Handle swipe completion
@@ -82,11 +129,10 @@ export default function QuestionScreen() {
       translateX.value = 0;
       opacity.value = withTiming(1, { duration: 200 });
     } else {
-      // Complete card and go back to main game screen
-      completeCurrentQuestion();
-      router.replace("/game");
+      // Complete card - this will handle the reshuffle check
+      handleComplete();
     }
-  }, [cardFace, completeCurrentQuestion, router, translateX, opacity]);
+  }, [cardFace, handleComplete, translateX, opacity]);
 
   // Swipe gesture handler
   const panGesture = Gesture.Pan()
@@ -142,7 +188,23 @@ export default function QuestionScreen() {
     router.push("/settings");
   };
 
-  // If no current question, show error or go back
+  // If popup is showing (transitional state after completing question)
+  if (showLowCardsPopup && pendingCategoryRef.current) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.content}>
+          {/* Keep the background consistent */}
+        </View>
+        <LowCardsPopup
+          visible={true}
+          categoryName={pendingCategoryRef.current.label}
+          onConfirm={handleLowCardsConfirm}
+        />
+      </View>
+    );
+  }
+
+  // If no current question and no popup, show error
   if (!currentQuestion || !currentCategory) {
     return (
       <View style={styles.container}>
@@ -194,7 +256,7 @@ export default function QuestionScreen() {
         </GestureDetector>
       </View>
 
-      {/* Menu Modal - NO gameplay buttons */}
+      {/* Menu Modal */}
       <GameMenu
         visible={menuVisible}
         onClose={() => setMenuVisible(false)}

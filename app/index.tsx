@@ -102,12 +102,12 @@ export default function MainMenuScreen() {
             </Pressable>
           )}
 
-          {/* Rules button (disabled placeholder) */}
+          {/* Rules button */}
           <Pressable
-            style={[styles.button, styles.disabledButton]}
+            style={[styles.button, styles.secondaryButton]}
             onPress={handleRules}
           >
-            <Text style={[styles.buttonText, styles.disabledText]}>Regler</Text>
+            <Text style={styles.buttonText}>Regler</Text>
           </Pressable>
 
           {/* Settings button (disabled placeholder) */}

@@ -1,14 +1,9 @@
-import {
-  Category,
-  categories,
-  getCategoryById,
-  getRandomCategory,
-} from "@/constants/categories";
+import { Category, categories, getCategoryById } from "@/constants/categories";
 import questionsData from "@/data/questions.json";
 import { useCallback, useState } from "react";
 
 /**
- * Question type definition - updated with date and event fields
+ * Question type definition
  */
 export interface Question {
   id: number;
@@ -25,33 +20,30 @@ export type GameState = "idle" | "playing" | "finished";
 
 /**
  * Outcome types for drawRandomOutcome
- * - "category": directly go to question with this category
- * - "choose": user picks category (svart or vit outcome)
+ * - "category": show category result screen, then question
+ * - "choose": user or opponent picks category
  */
 export type RandomOutcome =
   | { type: "category"; categoryId: string }
-  | { type: "choose" };
+  | { type: "choose"; mode: "user" | "opponent" };
 
 /**
- * Category color outcomes (for direct category selection)
+ * The 6 possible outcomes with equal probability
  */
-const CATEGORY_COLORS = ["gul", "blå", "lila", "grön"] as const;
+const OUTCOMES = [
+  { type: "category", categoryId: "prylar" }, // Yellow
+  { type: "category", categoryId: "personer" }, // Blue
+  { type: "category", categoryId: "underhallning" }, // Purple
+  { type: "category", categoryId: "blandat" }, // Green
+  { type: "choose", mode: "user" }, // White - user chooses
+  { type: "choose", mode: "opponent" }, // Black - opponent chooses
+] as const;
 
 /**
- * Probability of "svart eller vitt" (choose mode)
- * 15% = 0.15
+ * Minimum cards threshold before reshuffling category
+ * When remaining cards < 5, reshuffle is triggered
  */
-const CHOOSE_PROBABILITY = 0.15;
-
-/**
- * Map color outcomes to category IDs
- */
-const COLOR_TO_CATEGORY: Record<string, string> = {
-  gul: "prylar",
-  blå: "personer",
-  lila: "underhallning",
-  grön: "blandat",
-};
+const MIN_CARDS_THRESHOLD = 5;
 
 /**
  * Get the full answer date string (e.g., "17 juni 2025")
@@ -77,10 +69,18 @@ export const useGameEngine = () => {
   // Current question being displayed
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
 
-  // IDs of questions used in this game session (cannot be reused)
-  const [usedQuestions, setUsedQuestions] = useState<number[]>([]);
+  // Per-category used questions tracking
+  // Key: categoryId, Value: array of question IDs used in that category
+  const [usedQuestionsByCategory, setUsedQuestionsByCategory] = useState<
+    Record<string, number[]>
+  >({
+    prylar: [],
+    personer: [],
+    underhallning: [],
+    blandat: [],
+  });
 
-  // IDs of questions in the discard pile (completed questions)
+  // IDs of questions in the discard pile (completed questions - NEVER resets during session)
   const [discardPile, setDiscardPile] = useState<number[]>([]);
 
   // Current index in discard pile for navigation
@@ -90,7 +90,12 @@ export const useGameEngine = () => {
    * Start a new game - resets all state
    */
   const startNewGame = useCallback(() => {
-    setUsedQuestions([]);
+    setUsedQuestionsByCategory({
+      prylar: [],
+      personer: [],
+      underhallning: [],
+      blandat: [],
+    });
     setDiscardPile([]);
     setCurrentCategory(null);
     setCurrentQuestion(null);
@@ -108,34 +113,23 @@ export const useGameEngine = () => {
   /**
    * Check if there's a game in progress
    */
-  const hasGameInProgress = usedQuestions.length > 0 || discardPile.length > 0;
+  const hasGameInProgress =
+    discardPile.length > 0 ||
+    Object.values(usedQuestionsByCategory).some((arr) => arr.length > 0);
 
   /**
-   * Draw a random outcome
-   * ~15% chance for "svart eller vitt" (choose mode)
-   * ~85% chance for a random category
+   * Draw a random outcome (1/6 each, equal probability)
+   * Returns category to show result screen, or choose mode for user/opponent selection
    */
   const drawRandomOutcome = useCallback((): RandomOutcome => {
-    // 15% chance for "choose" mode (svart eller vitt)
-    if (Math.random() < CHOOSE_PROBABILITY) {
-      return { type: "choose" };
+    const randomIndex = Math.floor(Math.random() * OUTCOMES.length);
+    const outcome = OUTCOMES[randomIndex];
+
+    if (outcome.type === "choose") {
+      return { type: "choose", mode: outcome.mode };
     }
 
-    // 85% chance - pick a random category color
-    const randomIndex = Math.floor(Math.random() * CATEGORY_COLORS.length);
-    const pick = CATEGORY_COLORS[randomIndex];
-    const categoryId = COLOR_TO_CATEGORY[pick];
-
-    return { type: "category", categoryId };
-  }, []);
-
-  /**
-   * Draw a random category (legacy function, still available)
-   */
-  const drawRandomCategory = useCallback((): Category => {
-    const category = getRandomCategory();
-    setCurrentCategory(category);
-    return category;
+    return { type: "category", categoryId: outcome.categoryId };
   }, []);
 
   /**
@@ -156,15 +150,61 @@ export const useGameEngine = () => {
   }, []);
 
   /**
-   * Get available questions for a category (not yet used)
+   * Get total questions in a category
+   */
+  const getTotalQuestionsInCategory = useCallback(
+    (categoryId: string): number => {
+      return allQuestions.filter((q) => q.category === categoryId).length;
+    },
+    [allQuestions]
+  );
+
+  /**
+   * Get remaining (unused) cards count for a category
+   */
+  const getRemainingCards = useCallback(
+    (categoryId: string): number => {
+      const totalInCategory = allQuestions.filter(
+        (q) => q.category === categoryId
+      ).length;
+      const usedInCategory = usedQuestionsByCategory[categoryId]?.length || 0;
+      return totalInCategory - usedInCategory;
+    },
+    [allQuestions, usedQuestionsByCategory]
+  );
+
+  /**
+   * Check if category needs reshuffling (less than 10 cards remaining)
+   */
+  const needsReshuffle = useCallback(
+    (categoryId: string): boolean => {
+      return getRemainingCards(categoryId) < MIN_CARDS_THRESHOLD;
+    },
+    [getRemainingCards]
+  );
+
+  /**
+   * Reset used questions for a specific category only
+   * Does NOT affect discard pile
+   */
+  const resetUsedQuestionsForCategory = useCallback((categoryId: string) => {
+    setUsedQuestionsByCategory((prev) => ({
+      ...prev,
+      [categoryId]: [],
+    }));
+  }, []);
+
+  /**
+   * Get available questions for a category (not yet used in this category)
    */
   const getAvailableQuestions = useCallback(
     (categoryId: string): Question[] => {
+      const usedIds = usedQuestionsByCategory[categoryId] || [];
       return allQuestions.filter(
-        (q) => q.category === categoryId && !usedQuestions.includes(q.id)
+        (q) => q.category === categoryId && !usedIds.includes(q.id)
       );
     },
-    [allQuestions, usedQuestions]
+    [allQuestions, usedQuestionsByCategory]
   );
 
   /**
@@ -189,12 +229,16 @@ export const useGameEngine = () => {
   );
 
   /**
-   * Mark a question as used (cannot be drawn again this session)
+   * Mark a question as used in its category
    */
-  const markQuestionAsUsed = useCallback((questionId: number) => {
-    setUsedQuestions((prev) => {
-      if (prev.includes(questionId)) return prev;
-      return [...prev, questionId];
+  const markQuestionAsUsed = useCallback((question: Question) => {
+    setUsedQuestionsByCategory((prev) => {
+      const categoryUsed = prev[question.category] || [];
+      if (categoryUsed.includes(question.id)) return prev;
+      return {
+        ...prev,
+        [question.category]: [...categoryUsed, question.id],
+      };
     });
   }, []);
 
@@ -216,10 +260,10 @@ export const useGameEngine = () => {
    */
   const completeCurrentQuestion = useCallback(() => {
     if (currentQuestion) {
-      markQuestionAsUsed(currentQuestion.id);
+      markQuestionAsUsed(currentQuestion);
       addToDiscardPile(currentQuestion.id);
       setCurrentQuestion(null);
-      setCurrentCategory(null); // Clear category so next round starts fresh
+      setCurrentCategory(null);
     }
   }, [currentQuestion, markQuestionAsUsed, addToDiscardPile]);
 
@@ -244,7 +288,7 @@ export const useGameEngine = () => {
 
   /**
    * Navigate through discard pile
-   * direction: -1 for newer (left swipe), 1 for older (right swipe)
+   * direction: -1 for newer, 1 for older
    */
   const navigateDiscardPile = useCallback(
     (direction: -1 | 1): Question | null => {
@@ -268,10 +312,15 @@ export const useGameEngine = () => {
   }, [getDiscardCard, discardIndex]);
 
   /**
-   * Reset the round (clear used questions but keep discard pile)
+   * Reset the round (clear all used questions but keep discard pile)
    */
   const resetRound = useCallback(() => {
-    setUsedQuestions([]);
+    setUsedQuestionsByCategory({
+      prylar: [],
+      personer: [],
+      underhallning: [],
+      blandat: [],
+    });
     setCurrentQuestion(null);
     setCurrentCategory(null);
   }, []);
@@ -296,18 +345,10 @@ export const useGameEngine = () => {
   );
 
   /**
-   * Check if all questions are used
+   * Check if all questions are used across all categories
    */
-  const areAllQuestionsUsed = usedQuestions.length >= allQuestions.length;
-
-  /**
-   * Get count of remaining questions in a category
-   */
-  const getRemainingInCategory = useCallback(
-    (categoryId: string): number => {
-      return getAvailableQuestions(categoryId).length;
-    },
-    [getAvailableQuestions]
+  const areAllQuestionsUsed = Object.keys(usedQuestionsByCategory).every(
+    (categoryId) => isCategoryExhausted(categoryId)
   );
 
   /**
@@ -316,9 +357,12 @@ export const useGameEngine = () => {
   const getTotalQuestions = allQuestions.length;
 
   /**
-   * Get used question count
+   * Get total used question count across all categories
    */
-  const getUsedCount = usedQuestions.length;
+  const getUsedCount = Object.values(usedQuestionsByCategory).reduce(
+    (sum, arr) => sum + arr.length,
+    0
+  );
 
   /**
    * Get discard pile count
@@ -335,7 +379,7 @@ export const useGameEngine = () => {
     gameState,
     currentCategory,
     currentQuestion,
-    usedQuestions,
+    usedQuestionsByCategory,
     discardPile,
     discardIndex,
     hasGameInProgress,
@@ -345,7 +389,6 @@ export const useGameEngine = () => {
     startNewGame,
     resumeGame,
     endGame,
-    drawRandomCategory,
     drawRandomOutcome,
     selectCategory,
     selectCategoryById,
@@ -357,11 +400,14 @@ export const useGameEngine = () => {
     getCurrentDiscardCard,
     getDiscardCard,
     resetRound,
+    resetUsedQuestionsForCategory,
 
     // Utilities
     getAvailableQuestions,
     isCategoryExhausted,
-    getRemainingInCategory,
+    getRemainingCards,
+    needsReshuffle,
+    getTotalQuestionsInCategory,
     getTotalQuestions,
     getUsedCount,
     getDiscardCount,
