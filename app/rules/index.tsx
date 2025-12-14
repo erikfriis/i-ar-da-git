@@ -109,7 +109,7 @@ export default function RulesScreen() {
         <View style={styles.buttonContainer}>
           {!isFirstStep && (
             <Pressable style={styles.navButton} onPress={handlePrevious}>
-              <Text style={styles.navButtonText}>föregående</Text>
+            <Text style={styles.navButtonText}>{"<"}</Text>
             </Pressable>
           )}
 
@@ -118,7 +118,7 @@ export default function RulesScreen() {
             onPress={handleNext}
           >
             <Text style={styles.navButtonText}>
-              {isLastStep ? "stäng" : "nästa"}
+              {isLastStep ? "stäng" : ">"}
             </Text>
           </Pressable>
         </View>
@@ -185,15 +185,15 @@ const styles = StyleSheet.create({
   cardContent: {
     flex: 1,
     backgroundColor: "#FFFFFF",
-    borderRadius: 8,
+    borderRadius: 1,
     paddingHorizontal: 20,
     paddingVertical: 24,
     justifyContent: "center",
   },
   ruleText: {
-    fontSize: 17,
+    fontSize: 18,
     fontWeight: "500",
-    color: "#1F2937",
+    color: "#1B1B1B",
     textAlign: "center",
     lineHeight: 26,
   },
@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   navButton: {
-    backgroundColor: "rgba(0, 0, 0, 0.3)",
+    backgroundColor: "#1B1B1B",
     paddingHorizontal: 28,
     paddingVertical: 14,
     borderRadius: 8,

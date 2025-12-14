@@ -42,9 +42,6 @@ export const GameMenu: React.FC<GameMenuProps> = ({
       onRequestClose={onClose}
     >
       <View style={styles.overlay}>
-        <View style={styles.menuContainer}>
-          <Text style={styles.menuTitle}>meny</Text>
-
           <View style={styles.menuItems}>
             {/* Rules - active */}
             <Pressable
@@ -59,12 +56,11 @@ export const GameMenu: React.FC<GameMenuProps> = ({
               style={[
                 styles.menuButton,
                 styles.yellowButton,
-                styles.disabledButton,
               ]}
               onPress={onSettings}
             >
               <Text style={[styles.menuButtonText, styles.disabledText]}>
-                inst.
+                inställningar
               </Text>
             </Pressable>
 
@@ -73,7 +69,6 @@ export const GameMenu: React.FC<GameMenuProps> = ({
               style={[
                 styles.menuButton,
                 styles.blueButton,
-                styles.disabledButton,
               ]}
               onPress={onAccount}
             >
@@ -95,7 +90,6 @@ export const GameMenu: React.FC<GameMenuProps> = ({
           <Pressable style={styles.continueButton} onPress={onContinue}>
             <Text style={styles.continueButtonText}>Fortsätt</Text>
           </Pressable>
-        </View>
       </View>
     </Modal>
   );
@@ -108,46 +102,30 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  menuContainer: {
-    width: width * 0.75,
-    maxWidth: 300,
-    backgroundColor: "#1E293B",
-    borderRadius: 16,
-    padding: 24,
-    alignItems: "center",
-  },
-  menuTitle: {
-    fontSize: 24,
-    fontWeight: "700",
-    color: "#FFFFFF",
-    marginBottom: 24,
-  },
+
   menuItems: {
     width: "100%",
-    gap: 12,
+    gap: 20,
   },
   menuButton: {
     paddingVertical: 14,
     paddingHorizontal: 24,
     borderRadius: 8,
     alignItems: "center",
+    backgroundColor: "#1B1B1B",
+    borderWidth: 10,
   },
   greenButton: {
-    backgroundColor: "#22C55E",
+    borderColor: "#149339",
   },
   yellowButton: {
-    backgroundColor: "#F59E0B",
+    borderColor: "#FDC300",
   },
   blueButton: {
-    backgroundColor: "#3B82F6",
+    borderColor: "#00A5E4",
   },
   outlineButton: {
-    backgroundColor: "transparent",
-    borderWidth: 2,
-    borderColor: "#F59E0B",
-  },
-  disabledButton: {
-    opacity: 0.5,
+    borderColor: "#5A2479",
   },
   menuButtonText: {
     fontSize: 16,
@@ -155,20 +133,21 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
   },
   disabledText: {
-    opacity: 0.7,
+    opacity: 1,
   },
-  outlineButtonText: {
-    fontSize: 16,
+  outlineButtonText: { // * Borde byta namn till "purpleButton"
+    fontSize: 16, // * Borde byta namn till "purpleButton"
     fontWeight: "600",
-    color: "#F59E0B",
+    color: "#FFFFFF",
   },
   continueButton: {
     marginTop: 24,
     paddingVertical: 8,
   },
   continueButtonText: {
-    fontSize: 14,
-    color: "rgba(255, 255, 255, 0.6)",
+    fontSize: 16,
+    fontWeight: "600",
+    color: "rgba(255, 255, 255, 1)",
   },
 });
 

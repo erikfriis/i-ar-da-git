@@ -112,14 +112,14 @@ const styles = StyleSheet.create({
     backgroundColor: "000000",
   },
   questionCard: {
-    backgroundColor: "#000000",
+    backgroundColor: "#1B1B1B",
   },
   categoryHeader: {
     paddingBottom: 16,
     paddingHorizontal: 16,
   },
   categoryLabel: {
-    fontSize: 29,
+    fontSize: 24,
     fontWeight: "600",
     color: "#ffffff",
     textAlign: "center",
@@ -127,6 +127,7 @@ const styles = StyleSheet.create({
   questionContent: {
     flex: 1,
     justifyContent: "flex-start",
+    borderRadius: 1,
     paddingHorizontal: 20,
     paddingVertical: 16,
     backgroundColor: "#ffffff",
@@ -144,7 +145,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   footerTitle: {
-    fontSize: 46,
+    fontSize: 32,
     fontWeight: "700",
     color: "#ffffff",
   },
@@ -155,7 +156,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
   },
   fullDateText: {
-    fontSize: 42,
+    fontSize: 32,
     fontWeight: "800",
     textAlign: "center",
     marginBottom: 8,

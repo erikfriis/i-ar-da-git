@@ -126,12 +126,12 @@ export default function CategoryScreen() {
       <View style={styles.content}>
         {/* Title Card */}
         <View style={styles.titleCard}>
-          <Text style={styles.title}>i år då?</Text>
+          <Text style={styles.title}>[bild på tärning]</Text>
         </View>
 
         {/* Random Category Button */}
         <Pressable style={styles.categoryButton} onPress={handleRandomCategory}>
-          <Text style={styles.categoryButtonText}>Slumpa kategori</Text>
+          <Text style={styles.categoryButtonText}>Svep upp för att kasta tärningen!</Text>
         </Pressable>
       </View>
 
@@ -162,7 +162,6 @@ const styles = StyleSheet.create({
     paddingBottom: 60,
   },
   titleCard: {
-    backgroundColor: "#1E1E1E",
     paddingHorizontal: 48,
     paddingVertical: 32,
     borderRadius: 16,
@@ -170,20 +169,25 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 36,
-    fontWeight: "800",
+    fontWeight: "600",
     color: "#FFFFFF",
     letterSpacing: -1,
+    textAlign: "center"
   },
   categoryButton: {
-    backgroundColor: "#2563EB",
+    // backgroundColor: "#1B1B1B", 
     paddingVertical: 16,
     paddingHorizontal: 40,
     borderRadius: 12,
+    // borderWidth: 10,
+    // borderColor: "#149339",
+    maxWidth: 250,
   },
   categoryButtonText: {
     color: "#FFFFFF",
     fontSize: 18,
     fontWeight: "600",
+    textAlign: "center"
   },
   messageCard: {
     backgroundColor: "#1E1E1E",
