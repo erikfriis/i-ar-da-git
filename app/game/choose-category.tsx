@@ -43,7 +43,7 @@ export default function ChooseCategoryScreen() {
 
   // Title based on mode
   const title = mode === "opponent" ? "Motståndaren väljer" : "Du väljer";
-  const subtitle = "kategori";
+  const subtitle = "kategori!";
 
   /**
    * Handle category selection
@@ -213,9 +213,10 @@ const styles = StyleSheet.create({
   titleContainer: {
     alignItems: "center",
     paddingVertical: 24,
+    backgroundColor: "#D24662",
   },
   titleCard: {
-    backgroundColor: "#1E1E1E",
+    backgroundColor: "#D24662",
     paddingHorizontal: 32,
     paddingVertical: 20,
     borderRadius: 12,
@@ -227,9 +228,9 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
   },
   subtitleText: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "rgba(255, 255, 255, 0.7)",
+    fontSize: 22,
+    fontWeight: "800",
+    color: "#FFFFFF",
     marginTop: 4,
   },
   gridContainer: {
@@ -259,7 +260,7 @@ const styles = StyleSheet.create({
   categoryLabel: {
     fontSize: 15,
     fontWeight: "700",
-    color: "#1F2937",
+    color: "#FFFFFF",
     textAlign: "center",
     lineHeight: 22,
   },

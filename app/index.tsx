@@ -83,14 +83,14 @@ export default function MainMenuScreen() {
                 style={[styles.button, styles.primaryButton]}
                 onPress={handleStartNewGame}
               >
-                <Text style={styles.buttonText}>Starta nytt spel</Text>
+                <Text style={styles.buttonText}>nytt spel</Text>
               </Pressable>
 
               <Pressable
                 style={[styles.button, styles.secondaryButton]}
                 onPress={handleResumeGame}
               >
-                <Text style={styles.buttonText}>Återuppta spel</Text>
+                <Text style={styles.buttonText}>återuppta</Text>
               </Pressable>
             </>
           ) : (
