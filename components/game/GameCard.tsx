@@ -58,12 +58,12 @@ export const GameCard: React.FC<GameCardProps> = ({
             </Text>
           </View>
 
-          {buttonText && onButtonPress && (
+        </View>
+        {buttonText && onButtonPress && (
             <Pressable style={styles.button} onPress={onButtonPress}>
               <Text style={styles.buttonText}>{buttonText}</Text>
             </Pressable>
           )}
-        </View>
       </View>
     );
   }
@@ -166,12 +166,14 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   button: {
-    backgroundColor: "#2563EB",
+    backgroundColor: "#1b1b1b",
     paddingHorizontal: 32,
     paddingVertical: 14,
     borderRadius: 8,
     alignSelf: "center",
     marginBottom: 24,
+    borderWidth: 10,
+    borderColor: "#00A5E4",
   },
   buttonText: {
     color: "#FFFFFF",

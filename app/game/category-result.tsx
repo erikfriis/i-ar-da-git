@@ -37,12 +37,19 @@ export default function CategoryResultScreen() {
   const discardCount = getDiscardCount;
 
   // Determine text color based on background
-  const isLightBackground =
-    category?.color === "#F7D358" || category?.color === "#7AD17A";
-  const textColor = isLightBackground ? "#1F2937" : "#FFFFFF";
-  const buttonBgColor = isLightBackground ? "#1F2937" : "#FFFFFF";
-  const buttonTextColor = isLightBackground ? "#FFFFFF" : "#1F2937";
+  /**
+   * Not needed when background is constant: 
+   * const isLightBackground =
+   * category?.color === "#F7D358" || category?.color === "#7AD17A";
+   * const textColor = isLightBackground ? "#1F2937" : "#FFFFFF";
+   * const buttonBgColor = isLightBackground ? "#1F2937" : "#FFFFFF";
+   * const buttonTextColor = isLightBackground ? "#FFFFFF" : "#1F2937";
+   */ 
 
+  const textColor = "#FFFFFF";
+  const buttonBgColor = "#000000";
+  const buttonTextColor = "#FFFFFF";
+ 
   /**
    * Handle "Visa frågekort" button press
    * Checks for low cards first, then navigates to question
@@ -127,7 +134,7 @@ export default function CategoryResultScreen() {
     <View
       style={[
         styles.container,
-        { backgroundColor: category.color, paddingTop: insets.top },
+        { backgroundColor: "#D24662", paddingTop: insets.top },
       ]}
     >
       {/* Header */}
@@ -139,7 +146,7 @@ export default function CategoryResultScreen() {
 
       {/* Content */}
       <View style={styles.content}>
-        <Text style={[styles.subtitle, { color: textColor, opacity: 0.8 }]}>
+        <Text style={[styles.subtitle, { color: textColor}]}>
           Du fick kategorin
         </Text>
 
@@ -192,15 +199,14 @@ const styles = StyleSheet.create({
     paddingBottom: 60,
   },
   subtitle: {
-    fontSize: 20,
-    fontWeight: "600",
+    fontSize: 24,
+    fontWeight: "700",
     marginBottom: 24,
   },
   categoryCard: {
     paddingHorizontal: 32,
     paddingVertical: 24,
     borderRadius: 16,
-    backgroundColor: "rgba(0, 0, 0, 0.1)",
     marginBottom: 48,
   },
   categoryLabel: {
@@ -213,6 +219,8 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     paddingHorizontal: 40,
     borderRadius: 12,
+    borderWidth: 10,
+    borderColor: "#00A5E4", // Could be dependent on category.
   },
   buttonText: {
     fontSize: 18,
