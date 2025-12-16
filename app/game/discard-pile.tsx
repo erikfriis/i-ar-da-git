@@ -484,7 +484,7 @@ const styles = StyleSheet.create({
   categoryLabel: {
     fontSize: 14,
     fontWeight: "700",
-    color: "#1F2937",
+    color: "#FFFFFF",
     textAlign: "center",
   },
   cardInner: {
@@ -493,7 +493,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
     marginBottom: 8,
     backgroundColor: "#FFFFFF",
-    borderRadius: 12,
+    borderRadius: 1,
     justifyContent: "center",
     alignItems: "center",
   },
