@@ -273,7 +273,7 @@ export default function DiscardPileScreen() {
         <View style={styles.content}>
           <View style={styles.emptyCard}>
             <Text style={styles.emptyText}>Slänghögen är tom</Text>
-            <Text style={styles.emptySubtext}>Inga kort har spelats ännu</Text>
+            <Text style={styles.emptySubtext}>Inga kort har spelats</Text>
           </View>
         </View>
 
@@ -321,10 +321,7 @@ export default function DiscardPileScreen() {
                 <>
                   {/* Category header */}
                   <View
-                    style={[
-                      styles.categoryHeader,
-                      { backgroundColor: categoryColor },
-                    ]}
+                    style={[styles.categoryHeader]}
                   >
                     <Text style={styles.categoryLabel}>{category?.label}</Text>
                   </View>
@@ -338,21 +335,11 @@ export default function DiscardPileScreen() {
                   </View>
 
                   {/* Footer section */}
-                  <View style={styles.footerSection}>
+                  <View style={styles.footer}>
                     <Text style={styles.footerTitle}>i år då?</Text>
                     <Text style={styles.positionIndicator}>
                       {discardPile.length - activeIndex}
                     </Text>
-                  </View>
-
-                  {/* Answer section with category color */}
-                  <View
-                    style={[
-                      styles.answerSection,
-                      { backgroundColor: categoryColor },
-                    ]}
-                  >
-                    <Text style={styles.answerText}>{fullAnswerDate}</Text>
                   </View>
                 </>
               )}
@@ -477,13 +464,17 @@ const styles = StyleSheet.create({
     backgroundColor: "#1A1A1A",
     overflow: "hidden",
   },
+
+  /**
+   * The categortHeader padding makes the header size depend on the lable size.
+   */
   categoryHeader: {
-    paddingVertical: 12,
+    paddingVertical: 16,
     paddingHorizontal: 16,
   },
   categoryLabel: {
-    fontSize: 14,
-    fontWeight: "700",
+    fontSize: 24,
+    fontWeight: "600",
     color: "#FFFFFF",
     textAlign: "center",
   },
@@ -498,26 +489,30 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   eventContent: {
-    paddingHorizontal: 16,
-    paddingVertical: 20,
+    flex: 1,
+    justifyContent: "flex-start",
+    borderRadius: 1,
+    paddingHorizontal: 20,
+    paddingVertical: 16,
   },
   eventText: {
-    fontSize: 15,
+    fontSize: 18,
     fontWeight: "500",
     color: "#1F2937",
     textAlign: "center",
     lineHeight: 22,
   },
-  footerSection: {
+  footer: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: 8,
     paddingHorizontal: 16,
+    gap: 12,
   },
   footerTitle: {
-    fontSize: 18,
-    fontWeight: "800",
+    fontSize: 32,
+    fontWeight: "700",
     color: "#FFFFFF",
   },
   positionIndicator: {
@@ -556,7 +551,7 @@ const styles = StyleSheet.create({
     right: -16,
   },
   floatingArrowDisabled: {
-    backgroundColor: "rgba(0, 0, 0, 0.2)",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   arrowText: {
     fontSize: 28,
@@ -565,11 +560,10 @@ const styles = StyleSheet.create({
     marginTop: -2,
   },
   arrowTextDisabled: {
-    color: "rgba(255, 255, 255, 0.3)",
+    color: "rgba(255, 255, 255,0.1)",
   },
   // Empty state
   emptyCard: {
-    backgroundColor: "#1E1E1E",
     paddingHorizontal: 40,
     paddingVertical: 32,
     borderRadius: 16,
@@ -577,12 +571,14 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 20,
+    fontStyle: "italic",
     fontWeight: "700",
     color: "#FFFFFF",
     marginBottom: 8,
   },
   emptySubtext: {
     fontSize: 14,
+    fontStyle: "italic",
     color: "rgba(255, 255, 255, 0.6)",
   },
   // Slider styles - mini card tiles
@@ -613,14 +609,14 @@ const styles = StyleSheet.create({
     width: MINI_CARD_WIDTH,
     height: MINI_CARD_HEIGHT,
     borderRadius: 8,
-    borderWidth: 2,
-    borderColor: "rgba(255, 255, 255, 0.5)",
+    borderWidth: 4,
+    borderColor: "#A73349",
     backgroundColor: "transparent",
   },
   miniCardDate: {
     fontSize: 14,
     fontWeight: "700",
-    color: "#1F2937",
+    color: "#FFFFFF",
     textAlign: "center",
   },
 });
