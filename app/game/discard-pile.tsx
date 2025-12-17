@@ -89,7 +89,9 @@ const MiniCard: React.FC<MiniCardProps> = ({ question, isActive, onPress }) => {
         android_disableSound
         android_ripple={null}
       >
-        <View style={styles.miniCardOutline}>{/* Empty - no content */}</View>
+        <View style={styles.miniCardOutline}>
+          <Text style={styles.outlineDate}>{compactDate}</Text>
+          </View>
       </Pressable>
     );
   }
@@ -463,6 +465,8 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     backgroundColor: "#1A1A1A",
     overflow: "hidden",
+    justifyContent: "center", 
+    alignItems: "center",  
   },
 
   /**
@@ -479,10 +483,8 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   cardInner: {
-    flex: 1,
-    marginHorizontal: 16,
-    marginTop: 4,
-    marginBottom: 8,
+    width: CARD_WIDTH * 0.7, // gör rutan smalare
+    height: CARD_HEIGHT * 0.6, // valfritt, för höjd
     backgroundColor: "#FFFFFF",
     borderRadius: 1,
     justifyContent: "center",
@@ -605,6 +607,12 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 4,
   },
+  miniCardDate: {
+    fontSize: 14,
+    fontWeight: "700",
+    color: "#FFFFFF",
+    textAlign: "center",
+  },
   miniCardOutline: {
     width: MINI_CARD_WIDTH,
     height: MINI_CARD_HEIGHT,
@@ -612,11 +620,12 @@ const styles = StyleSheet.create({
     borderWidth: 4,
     borderColor: "#A73349",
     backgroundColor: "transparent",
+    justifyContent: "center",
   },
-  miniCardDate: {
+  outlineDate: {
     fontSize: 14,
     fontWeight: "700",
-    color: "#FFFFFF",
+    color: "#A73349",
     textAlign: "center",
   },
 });
