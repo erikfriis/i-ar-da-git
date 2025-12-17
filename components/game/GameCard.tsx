@@ -22,7 +22,7 @@ interface GameCardProps {
 /**
  * GameCard - Displays question or answer in the game's visual style
  * Question side: White card with category header and event text
- * Answer side: Category-colored card with full date
+ * Answer side: Category-colored card with category header and full date
  */
 export const GameCard: React.FC<GameCardProps> = ({
   event,
@@ -44,57 +44,58 @@ export const GameCard: React.FC<GameCardProps> = ({
       <View style={styles.container}>
         {/* Answer Card - Category color background */}
         <View style={[styles.card, { backgroundColor: categoryColor }]}>
+          {/* Header above white box*/}
+          {category && (
+            <View style={styles.categoryHeader}>
+              <Text style={styles.categoryLabel}>
+                {category.label}
+              </Text>
+            </View>
+          )}
+          {/* White box */}
           <View style={styles.answerContent}>
-            <Text style={[styles.fullDateText, { color: textColor }]}>
+            <Text style={styles.fullDateText}>
               {fullAnswerDate}
             </Text>
-            <Text
-              style={[
-                styles.answerSubtitle,
-                { color: textColor, opacity: 0.8 },
-              ]}
-            >
-              i år då?
-            </Text>
           </View>
-
+          {/* Game title below white box */}
+          <View style={styles.footer}>
+            <Text style={styles.footerTitle}>i år då?</Text>
+          </View>
         </View>
         {buttonText && onButtonPress && (
-            <Pressable style={styles.button} onPress={onButtonPress}>
-              <Text style={styles.buttonText}>{buttonText}</Text>
-            </Pressable>
-          )}
+          <Pressable style={styles.button} onPress={onButtonPress}>
+            <Text style={styles.buttonText}>{buttonText}</Text>
+          </Pressable>
+        )}
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
-      {/* Question Card - White with colored category header */}
-      <View style={[styles.card, styles.questionCard]}>
-        {/* Category header */}
-        {category && (
-          <View style={[styles.categoryHeader]}>
-            <Text style={styles.categoryLabel}>{category.label}</Text>
-          </View>
-        )}
-
-        {/* Event content */}
-        <View style={styles.questionContent}>
-          <Text style={styles.eventText}>{event}</Text>
+    <Pressable style={styles.container} onPress={onButtonPress}>
+    {/* Question Card - White with colored category header */}
+    <View style={[styles.card, styles.questionCard]}>
+      {/* Category header */}
+      {category && (
+        <View style={[styles.categoryHeader]}>
+          <Text style={styles.categoryLabel}>
+            {category.label}
+          </Text>
         </View>
-
-        {/* Footer with title and button */}
-        <View style={styles.footer}>
-          <Text style={styles.footerTitle}>i år då?</Text>
-        </View>
-      </View>
-      {buttonText && onButtonPress && (
-        <Pressable style={styles.button} onPress={onButtonPress}>
-          <Text style={styles.buttonText}>{buttonText}</Text>
-        </Pressable>
       )}
+
+      {/* Event content */}
+      <View style={styles.questionContent}>
+        <Text style={styles.eventText}>{event}</Text>
+      </View>
+
+      {/* Footer with title */}
+      <View style={styles.footer}>
+        <Text style={styles.footerTitle}>i år då?</Text>
+      </View>
     </View>
+  </Pressable>
   );
 };
 
@@ -149,21 +150,22 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: "#ffffff",
   },
+  
   answerContent: {
     flex: 1,
     justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: 24,
+    alignItems: "center",   
+    backgroundColor: "#ffffff",
+    borderRadius: 1,
+    paddingHorizontal: 20,
+    paddingVertical: 16,
   },
+  
   fullDateText: {
-    fontSize: 32,
+    fontSize: 24,
     fontWeight: "800",
     textAlign: "center",
     marginBottom: 8,
-  },
-  answerSubtitle: {
-    fontSize: 20,
-    fontWeight: "600",
   },
   button: {
     backgroundColor: "#1b1b1b",
@@ -171,6 +173,7 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 8,
     alignSelf: "center",
+    marginTop: 24,
     marginBottom: 24,
     borderWidth: 10,
     borderColor: "#00A5E4",
