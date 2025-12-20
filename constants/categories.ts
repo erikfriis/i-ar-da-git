@@ -12,22 +12,22 @@ export interface Category {
 export const categories: Category[] = [
   {
     id: "prylar",
-    color: "#F7D358",
+    color: "#FDC300",
     label: "Prylar, nyheter och uppfinningar",
   },
   {
     id: "personer",
-    color: "#8BC6FF",
+    color: "#00A5E4",
     label: "Kända personer och händelser",
   },
   {
     id: "underhallning",
-    color: "#B57EDC",
+    color: "#5A2479",
     label: "Underhållning",
   },
   {
     id: "blandat",
-    color: "#7AD17A",
+    color: "#149339",
     label: "Sport, fritid och blandat",
   },
 ];

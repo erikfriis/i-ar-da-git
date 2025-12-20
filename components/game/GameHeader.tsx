@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, Pressable } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface GameHeaderProps {
@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
   hamburgerLine: {
     width: 24,
     height: 3,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#A73349",
     borderRadius: 1.5,
   },
   discardIcon: {
@@ -110,8 +110,8 @@ const styles = StyleSheet.create({
     width: 18,
     height: 24,
     borderWidth: 2,
-    borderColor: "#FFFFFF",
-    borderRadius: 3,
+    borderColor: "#A73349",
+    borderRadius: 4,
     bottom: 0,
     right: 0,
   },
@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 0,
     right: -4,
-    backgroundColor: "#EF4444",
+    backgroundColor: "#A73349",
     borderRadius: 10,
     minWidth: 20,
     height: 20,

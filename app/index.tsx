@@ -1,10 +1,10 @@
-import React from "react";
-import { View, Text, StyleSheet, Pressable } from "react-native";
 import { useRouter } from "expo-router";
+import React from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { useGame } from "@/context/GameContext";
 import { IconSymbol } from "@/components/ui/icon-symbol";
+import { useGame } from "@/context/GameContext";
 
 /**
  * Main Menu Screen - "Huvudmeny"
@@ -83,14 +83,14 @@ export default function MainMenuScreen() {
                 style={[styles.button, styles.primaryButton]}
                 onPress={handleStartNewGame}
               >
-                <Text style={styles.buttonText}>Starta nytt spel</Text>
+                <Text style={styles.buttonText}>nytt spel</Text>
               </Pressable>
 
               <Pressable
                 style={[styles.button, styles.secondaryButton]}
                 onPress={handleResumeGame}
               >
-                <Text style={styles.buttonText}>Återuppta spel</Text>
+                <Text style={styles.buttonText}>återuppta</Text>
               </Pressable>
             </>
           ) : (
@@ -98,7 +98,7 @@ export default function MainMenuScreen() {
               style={[styles.button, styles.primaryButton]}
               onPress={handleStartGame}
             >
-              <Text style={styles.buttonText}>Starta spel</Text>
+              <Text style={styles.buttonText}>spela</Text>
             </Pressable>
           )}
 
@@ -107,7 +107,7 @@ export default function MainMenuScreen() {
             style={[styles.button, styles.secondaryButton]}
             onPress={handleRules}
           >
-            <Text style={styles.buttonText}>Regler</Text>
+            <Text style={styles.buttonText}>regler</Text>
           </Pressable>
 
           {/* Settings button (disabled placeholder) */}
@@ -115,8 +115,8 @@ export default function MainMenuScreen() {
             style={[styles.button, styles.disabledButton]}
             onPress={handleSettingsPress}
           >
-            <Text style={[styles.buttonText, styles.disabledText]}>
-              Inställningar
+            <Text style={[styles.buttonText]}>
+              inställningar
             </Text>
           </Pressable>
         </View>
@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
     paddingBottom: 60,
   },
   titleCard: {
-    backgroundColor: "#1E1E1E",
+    backgroundColor: "",
     paddingHorizontal: 48,
     paddingVertical: 32,
     borderRadius: 16,
@@ -164,36 +164,40 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 36,
-    fontWeight: "800",
+    fontWeight: "700",
     color: "#FFFFFF",
     letterSpacing: -1,
   },
   buttonContainer: {
     width: "100%",
-    maxWidth: 280,
-    gap: 14,
+    maxWidth: 170,
+    gap: 20,
   },
   button: {
     paddingVertical: 16,
     paddingHorizontal: 32,
     borderRadius: 12,
     alignItems: "center",
+    backgroundColor: "#1B1B1B",
+    borderWidth: 10,
   },
   primaryButton: {
-    backgroundColor: "#2563EB",
+    borderColor: "#149339",
   },
   secondaryButton: {
-    backgroundColor: "#059669",
+    borderColor: "#FDC300",
   },
-  disabledButton: {
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
+
+  /**
+   * Byt namn på disabledButton till settingsButton kanske? Bättre att den ser färdig ut tänker jag!
+   */
+  
+  disabledButton: { 
+    borderColor: "#00A5E4",
   },
   buttonText: {
     color: "#FFFFFF",
     fontSize: 18,
     fontWeight: "600",
-  },
-  disabledText: {
-    opacity: 0.6,
   },
 });
