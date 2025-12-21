@@ -1,55 +1,120 @@
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import React, { useCallback, useEffect, useState } from "react";
+import { ActivityIndicator, StyleSheet, View } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
+import { DiceOutcome, DiceRoller } from "@/components/game/DiceRoller";
 import { GameHeader } from "@/components/game/GameHeader";
 import { GameMenu } from "@/components/game/GameMenu";
+import { GamePopup } from "@/components/game/GamePopup";
 import { useGame } from "@/context/GameContext";
 
 /**
  * Category Selection Screen - "Slumpa kategori"
  *
- * 6 possible outcomes (1/6 each):
+ * Uses an animated dice roll to select one of 6 outcomes:
  * - Yellow (prylar) → category result screen
  * - Blue (personer) → category result screen
  * - Purple (underhållning) → category result screen
  * - Green (blandat) → category result screen
  * - White (vit) → choose category (user picks)
  * - Black (svart) → choose category (opponent picks)
+ *
+ * The dice only lands on categories that have remaining cards.
+ * If all categories are empty, shows "Alla kort är slut" popup.
  */
 export default function CategoryScreen() {
   const router = useRouter();
   const {
-    drawRandomOutcome,
+    isHydrated,
     getDiscardCount,
     endGame,
-    areAllQuestionsUsed,
+    isCategoryEmpty,
+    resetAllUsedQuestions,
+    menuVisible,
+    setMenuVisible,
+    setFlowStep,
   } = useGame();
 
   const discardCount = getDiscardCount;
-  const [menuVisible, setMenuVisible] = useState(false);
+  const [showAllCardsEmptyPopup, setShowAllCardsEmptyPopup] = useState(false);
+
+  // Update flow step when screen mounts
+  useEffect(() => {
+    if (isHydrated) {
+      setFlowStep("dice");
+    }
+  }, [isHydrated, setFlowStep]);
 
   /**
-   * Handle "Slumpa kategori" button press
-   * Randomly picks one of 6 outcomes
+   * Get available dice outcomes - only categories with remaining cards
    */
-  const handleRandomCategory = () => {
-    const result = drawRandomOutcome();
+  const getAvailableOutcomes = useCallback((): DiceOutcome[] => {
+    const outcomes: DiceOutcome[] = [];
 
-    if (result.type === "choose") {
-      // White or Black → navigate to choose category screen with mode
-      router.push({
-        pathname: "/game/choose-category",
-        params: { mode: result.mode },
-      });
-    } else {
-      // Colored category → navigate to category result screen
-      router.push({
-        pathname: "/game/category-result",
-        params: { categoryId: result.categoryId },
-      });
-    }
-  };
+    // Add colored categories only if they have remaining cards
+    if (!isCategoryEmpty("prylar")) outcomes.push("prylar");
+    if (!isCategoryEmpty("personer")) outcomes.push("personer");
+    if (!isCategoryEmpty("underhallning")) outcomes.push("underhallning");
+    if (!isCategoryEmpty("blandat")) outcomes.push("blandat");
+
+    // Always add choose options (vit/svart)
+    outcomes.push("choose-user");
+    outcomes.push("choose-opponent");
+
+    return outcomes;
+  }, [isCategoryEmpty]);
+
+  /**
+   * Handle when all categories are empty
+   */
+  const handleAllCategoriesEmpty = useCallback(() => {
+    setShowAllCardsEmptyPopup(true);
+  }, []);
+
+  /**
+   * Handle "Blanda om leken" - reset deck but keep discard pile
+   */
+  const handleReshuffleDeck = useCallback(() => {
+    setShowAllCardsEmptyPopup(false);
+    resetAllUsedQuestions();
+    // Stay on the dice screen - user can roll again
+  }, [resetAllUsedQuestions]);
+
+  /**
+   * Handle "Avsluta spel" - end game and go home
+   */
+  const handleEndGameFromPopup = useCallback(() => {
+    setShowAllCardsEmptyPopup(false);
+    endGame();
+    router.replace("/");
+  }, [endGame, router]);
+
+  /**
+   * Handle dice roll completion
+   * Maps DiceOutcome to navigation
+   */
+  const handleRollComplete = useCallback(
+    (outcome: DiceOutcome) => {
+      if (outcome === "choose-user") {
+        router.push({
+          pathname: "/game/choose-category",
+          params: { mode: "user" },
+        });
+      } else if (outcome === "choose-opponent") {
+        router.push({
+          pathname: "/game/choose-category",
+          params: { mode: "opponent" },
+        });
+      } else {
+        router.push({
+          pathname: "/game/category-result",
+          params: { categoryId: outcome },
+        });
+      }
+    },
+    [router]
+  );
 
   /**
    * Navigate to discard pile
@@ -77,44 +142,19 @@ export default function CategoryScreen() {
     router.push("/settings");
   };
 
-  // If all questions are used, show completion message
-  if (areAllQuestionsUsed) {
+  // Show loading while hydrating
+  if (!isHydrated) {
     return (
       <View style={styles.container}>
-        <GameHeader
-          onMenuPress={() => setMenuVisible(true)}
-          showDiscard={false}
-        />
-
         <View style={styles.content}>
-          <View style={styles.messageCard}>
-            <Text style={styles.messageTitle}>🎉</Text>
-            <Text style={styles.messageText}>Alla kort är slut!</Text>
-            <Text style={styles.messageSubtext}>
-              Du har gått igenom alla frågor.
-            </Text>
-          </View>
-
-          <Pressable style={styles.primaryButton} onPress={handleEndGame}>
-            <Text style={styles.buttonText}>Tillbaka till menyn</Text>
-          </Pressable>
+          <ActivityIndicator size="large" color="#FFFFFF" />
         </View>
-
-        <GameMenu
-          visible={menuVisible}
-          onClose={() => setMenuVisible(false)}
-          onRules={handleRules}
-          onSettings={handleSettings}
-          onAccount={() => {}}
-          onEndGame={handleEndGame}
-          onContinue={() => setMenuVisible(false)}
-        />
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <GestureHandlerRootView style={styles.container}>
       {/* Header */}
       <GameHeader
         onMenuPress={() => setMenuVisible(true)}
@@ -122,17 +162,13 @@ export default function CategoryScreen() {
         discardCount={discardCount}
       />
 
-      {/* Main content */}
+      {/* Main content with dice */}
       <View style={styles.content}>
-        {/* Title Card */}
-        <View style={styles.titleCard}>
-          <Text style={styles.title}>[bild på tärning]</Text>
-        </View>
-
-        {/* Random Category Button */}
-        <Pressable style={styles.categoryButton} onPress={handleRandomCategory}>
-          <Text style={styles.categoryButtonText}>Svep upp för att kasta tärningen!</Text>
-        </Pressable>
+        <DiceRoller
+          onRollComplete={handleRollComplete}
+          getAvailableOutcomes={getAvailableOutcomes}
+          onAllCategoriesEmpty={handleAllCategoriesEmpty}
+        />
       </View>
 
       {/* Menu Modal */}
@@ -145,7 +181,27 @@ export default function CategoryScreen() {
         onEndGame={handleEndGame}
         onContinue={() => setMenuVisible(false)}
       />
-    </View>
+
+      {/* All Cards Empty Popup */}
+      <GamePopup
+        visible={showAllCardsEmptyPopup}
+        icon="🎴"
+        title="Alla kort är slut"
+        message="Ni har spelat alla kort i leken."
+        buttons={[
+          {
+            label: "Blanda om leken",
+            onPress: handleReshuffleDeck,
+            variant: "primary",
+          },
+          {
+            label: "Avsluta spel",
+            onPress: handleEndGameFromPopup,
+            variant: "secondary",
+          },
+        ]}
+      />
+    </GestureHandlerRootView>
   );
 }
 
@@ -160,66 +216,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 24,
     paddingBottom: 60,
-  },
-  titleCard: {
-    paddingHorizontal: 48,
-    paddingVertical: 32,
-    borderRadius: 16,
-    marginBottom: 48,
-  },
-  title: {
-    fontSize: 36,
-    fontWeight: "600",
-    color: "#FFFFFF",
-    letterSpacing: -1,
-    textAlign: "center"
-  },
-  categoryButton: {
-    // backgroundColor: "#1B1B1B", 
-    paddingVertical: 16,
-    paddingHorizontal: 40,
-    borderRadius: 12,
-    // borderWidth: 10,
-    // borderColor: "#149339",
-    maxWidth: 250,
-  },
-  categoryButtonText: {
-    color: "#FFFFFF",
-    fontSize: 18,
-    fontWeight: "600",
-    textAlign: "center"
-  },
-  messageCard: {
-    backgroundColor: "#1E1E1E",
-    paddingHorizontal: 40,
-    paddingVertical: 32,
-    borderRadius: 16,
-    marginBottom: 32,
-    alignItems: "center",
-  },
-  messageTitle: {
-    fontSize: 48,
-    marginBottom: 16,
-  },
-  messageText: {
-    fontSize: 24,
-    fontWeight: "700",
-    color: "#FFFFFF",
-    marginBottom: 8,
-  },
-  messageSubtext: {
-    fontSize: 16,
-    color: "rgba(255, 255, 255, 0.7)",
-  },
-  primaryButton: {
-    backgroundColor: "#2563EB",
-    paddingVertical: 16,
-    paddingHorizontal: 40,
-    borderRadius: 12,
-  },
-  buttonText: {
-    color: "#FFFFFF",
-    fontSize: 18,
-    fontWeight: "600",
   },
 });

@@ -1,18 +1,19 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { GameHeader } from "@/components/game/GameHeader";
 import { GameMenu } from "@/components/game/GameMenu";
-import { LowCardsPopup } from "@/components/game/LowCardsPopup";
 import { getCategoryById } from "@/constants/categories";
 import { useGame } from "@/context/GameContext";
 
 /**
  * Category Result Screen - "Du fick kategorin"
- * Shown when a colored category is randomly selected
- * Full screen with category color background
+ * Shown when a colored category is randomly selected by the dice.
+ *
+ * Note: The dice only lands on categories with remaining cards,
+ * so we don't need to check for empty categories here.
  */
 export default function CategoryResultScreen() {
   const router = useRouter();
@@ -21,55 +22,37 @@ export default function CategoryResultScreen() {
   const categoryId = params.categoryId;
 
   const {
+    isHydrated,
     selectCategoryById,
     drawRandomQuestion,
-    getRemainingCards,
-    needsReshuffle,
-    resetUsedQuestionsForCategory,
     getDiscardCount,
     endGame,
+    menuVisible,
+    setMenuVisible,
+    setFlowStep,
+    setCategoryResultId,
   } = useGame();
-
-  const [menuVisible, setMenuVisible] = useState(false);
-  const [showLowCardsPopup, setShowLowCardsPopup] = useState(false);
 
   const category = categoryId ? getCategoryById(categoryId) : null;
   const discardCount = getDiscardCount;
 
-  // Determine text color based on background
-  /**
-   * Not needed when background is constant: 
-   * const isLightBackground =
-   * category?.color === "#F7D358" || category?.color === "#7AD17A";
-   * const textColor = isLightBackground ? "#1F2937" : "#FFFFFF";
-   * const buttonBgColor = isLightBackground ? "#1F2937" : "#FFFFFF";
-   * const buttonTextColor = isLightBackground ? "#FFFFFF" : "#1F2937";
-   */ 
-
   const textColor = "#FFFFFF";
   const buttonBgColor = "#000000";
   const buttonTextColor = "#FFFFFF";
- 
+
+  // Update flow step and store categoryId when screen mounts
+  useEffect(() => {
+    if (isHydrated && categoryId) {
+      setFlowStep("category-result");
+      setCategoryResultId(categoryId);
+    }
+  }, [isHydrated, categoryId, setFlowStep, setCategoryResultId]);
+
   /**
    * Handle "Visa frågekort" button press
-   * Checks for low cards first, then navigates to question
+   * Proceeds directly to question (no reshuffle checks needed)
    */
   const handleShowQuestion = () => {
-    if (!categoryId) return;
-
-    // Check if category needs reshuffling
-    if (needsReshuffle(categoryId)) {
-      setShowLowCardsPopup(true);
-      return;
-    }
-
-    proceedToQuestion();
-  };
-
-  /**
-   * Proceed to question after any reshuffling
-   */
-  const proceedToQuestion = () => {
     if (!categoryId) return;
 
     selectCategoryById(categoryId);
@@ -78,22 +61,10 @@ export default function CategoryResultScreen() {
     if (question) {
       router.push("/game/question");
     } else {
-      // This shouldn't happen after reshuffle, but handle it
+      // This shouldn't happen since dice only lands on non-empty categories
       alert("Inga frågor tillgängliga!");
       router.replace("/game");
     }
-  };
-
-  /**
-   * Handle low cards popup confirmation
-   * Reset the category and proceed
-   */
-  const handleLowCardsConfirm = () => {
-    if (!categoryId) return;
-
-    setShowLowCardsPopup(false);
-    resetUsedQuestionsForCategory(categoryId);
-    proceedToQuestion();
   };
 
   /**
@@ -122,6 +93,17 @@ export default function CategoryResultScreen() {
     router.push("/settings");
   };
 
+  // Show loading while hydrating
+  if (!isHydrated) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.content}>
+          <ActivityIndicator size="large" color="#FFFFFF" />
+        </View>
+      </View>
+    );
+  }
+
   if (!category) {
     return (
       <View style={styles.container}>
@@ -146,7 +128,7 @@ export default function CategoryResultScreen() {
 
       {/* Content */}
       <View style={styles.content}>
-        <Text style={[styles.subtitle, { color: textColor}]}>
+        <Text style={[styles.subtitle, { color: textColor }]}>
           Du fick kategorin
         </Text>
 
@@ -157,7 +139,10 @@ export default function CategoryResultScreen() {
         </View>
 
         <Pressable
-          style={[styles.button, { backgroundColor: buttonBgColor }]}
+          style={[
+            styles.button,
+            { backgroundColor: buttonBgColor, borderColor: category.color },
+          ]}
           onPress={handleShowQuestion}
         >
           <Text style={[styles.buttonText, { color: buttonTextColor }]}>
@@ -175,13 +160,6 @@ export default function CategoryResultScreen() {
         onAccount={() => {}}
         onEndGame={handleEndGame}
         onContinue={() => setMenuVisible(false)}
-      />
-
-      {/* Low Cards Popup */}
-      <LowCardsPopup
-        visible={showLowCardsPopup}
-        categoryName={category.label}
-        onConfirm={handleLowCardsConfirm}
       />
     </View>
   );
@@ -220,7 +198,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 40,
     borderRadius: 12,
     borderWidth: 10,
-    borderColor: "#00A5E4", // Could be dependent on category.
   },
   buttonText: {
     fontSize: 18,
@@ -232,4 +209,3 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
 });
-

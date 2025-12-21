@@ -1,13 +1,8 @@
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import {
-  Dimensions,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { Dimensions, Pressable, StyleSheet, Text, View } from "react-native";
 
+import { GameHeader } from "@/components/game/GameHeader";
 import rulesData from "@/data/rules.json";
 
 /**
@@ -29,10 +24,11 @@ const CARD_HEIGHT = CARD_WIDTH * 1.5;
 /**
  * Rules Screen
  * Displays game rules as step-based cards matching the game card design
- * 
+ *
  * - 5 steps total
- * - Navigation with "nästa" / "föregående" buttons
- * - Close icon in top right
+ * - Navigation with "Tillbaka" / "Nästa" buttons (always visible)
+ * - "Tillbaka" disabled on first step, "Nästa" disabled on last step
+ * - Close icon in top right (only way to exit)
  * - Always starts at step 1
  * - No state persistence between opens
  */
@@ -54,12 +50,10 @@ export default function RulesScreen() {
   };
 
   /**
-   * Go to next step or close on last step
+   * Go to next step
    */
   const handleNext = () => {
-    if (isLastStep) {
-      router.back();
-    } else {
+    if (!isLastStep) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -73,12 +67,13 @@ export default function RulesScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Close button in top right */}
-      <View style={styles.header}>
-        <Pressable style={styles.closeButton} onPress={handleClose}>
-          <Text style={styles.closeIcon}>✕</Text>
-        </Pressable>
-      </View>
+      {/* Header with close button only */}
+      <GameHeader
+        showMenu={false}
+        showDiscard={false}
+        showClose={true}
+        onClosePress={handleClose}
+      />
 
       {/* Main content */}
       <View style={styles.content}>
@@ -105,21 +100,24 @@ export default function RulesScreen() {
           </View>
         </View>
 
-        {/* Navigation buttons */}
+        {/* Navigation buttons - always show both */}
         <View style={styles.buttonContainer}>
-          {!isFirstStep && (
-            <Pressable style={styles.navButton} onPress={handlePrevious}>
-            <Text style={styles.navButtonText}>{"<"}</Text>
-            </Pressable>
-          )}
-
+          {/* Tillbaka button - disabled on first step */}
           <Pressable
-            style={[styles.navButton, styles.primaryButton]}
-            onPress={handleNext}
+            style={[styles.navButton, isFirstStep && styles.navButtonDisabled]}
+            onPress={handlePrevious}
+            disabled={isFirstStep}
           >
-            <Text style={styles.navButtonText}>
-              {isLastStep ? "stäng" : ">"}
-            </Text>
+            <Text style={styles.navButtonText}>Tillbaka</Text>
+          </Pressable>
+
+          {/* Nästa button - disabled on last step */}
+          <Pressable
+            style={[styles.navButton, isLastStep && styles.navButtonDisabled]}
+            onPress={handleNext}
+            disabled={isLastStep}
+          >
+            <Text style={styles.navButtonText}>Nästa</Text>
           </Pressable>
         </View>
       </View>
@@ -131,26 +129,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#D24662",
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    paddingHorizontal: 20,
-    paddingTop: 60,
-    paddingBottom: 10,
-  },
-  closeButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "rgba(0, 0, 0, 0.3)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  closeIcon: {
-    fontSize: 18,
-    color: "#FFFFFF",
-    fontWeight: "600",
   },
   content: {
     flex: 1,
@@ -188,7 +166,6 @@ const styles = StyleSheet.create({
     borderRadius: 1,
     paddingHorizontal: 20,
     paddingVertical: 24,
-    justifyContent: "center",
   },
   ruleText: {
     fontSize: 18,
@@ -228,8 +205,8 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 8,
   },
-  primaryButton: {
-    backgroundColor: "#2563EB",
+  navButtonDisabled: {
+    opacity: 0.4,
   },
   navButtonText: {
     color: "#FFFFFF",

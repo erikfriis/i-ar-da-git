@@ -32,7 +32,11 @@ export const GameHeader: React.FC<GameHeaderProps> = ({
       {/* Left side - Menu button */}
       <View style={styles.leftSection}>
         {showMenu && onMenuPress && (
-          <Pressable style={styles.iconButton} onPress={onMenuPress} hitSlop={12}>
+          <Pressable
+            style={styles.iconButton}
+            onPress={onMenuPress}
+            hitSlop={12}
+          >
             <View style={styles.hamburger}>
               <View style={styles.hamburgerLine} />
               <View style={styles.hamburgerLine} />
@@ -45,7 +49,11 @@ export const GameHeader: React.FC<GameHeaderProps> = ({
       {/* Right side - Discard or Close button */}
       <View style={styles.rightSection}>
         {showDiscard && onDiscardPress && (
-          <Pressable style={styles.iconButton} onPress={onDiscardPress} hitSlop={12}>
+          <Pressable
+            style={styles.iconButton}
+            onPress={onDiscardPress}
+            hitSlop={12}
+          >
             <View style={styles.discardIcon}>
               <View style={styles.discardCard} />
               <View style={[styles.discardCard, styles.discardCardOffset]} />
@@ -58,7 +66,11 @@ export const GameHeader: React.FC<GameHeaderProps> = ({
           </Pressable>
         )}
         {showClose && onClosePress && (
-          <Pressable style={styles.iconButton} onPress={onClosePress} hitSlop={12}>
+          <Pressable
+            style={styles.iconButton}
+            onPress={onClosePress}
+            hitSlop={12}
+          >
             <Text style={styles.closeIcon}>✕</Text>
           </Pressable>
         )}
@@ -144,4 +156,3 @@ const styles = StyleSheet.create({
 });
 
 export default GameHeader;
-

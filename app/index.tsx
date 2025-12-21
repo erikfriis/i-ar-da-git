@@ -1,9 +1,14 @@
 import { useRouter } from "expo-router";
-import React from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import React, { useEffect } from "react";
+import {
+  ActivityIndicator,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { IconSymbol } from "@/components/ui/icon-symbol";
 import { useGame } from "@/context/GameContext";
 
 /**
@@ -13,7 +18,20 @@ import { useGame } from "@/context/GameContext";
 export default function MainMenuScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { hasGameInProgress, startNewGame, resumeGame } = useGame();
+  const {
+    isHydrated,
+    hasGameInProgress,
+    startNewGame,
+    resumeGame,
+    setFlowStep,
+  } = useGame();
+
+  // Update flow step when on home
+  useEffect(() => {
+    if (isHydrated) {
+      setFlowStep("home");
+    }
+  }, [isHydrated, setFlowStep]);
 
   /**
    * Navigate to settings
@@ -25,8 +43,8 @@ export default function MainMenuScreen() {
   /**
    * Start a new game
    */
-  const handleStartNewGame = () => {
-    startNewGame();
+  const handleStartNewGame = async () => {
+    await startNewGame();
     router.push("/game");
   };
 
@@ -41,30 +59,41 @@ export default function MainMenuScreen() {
   /**
    * Start playing (first time)
    */
-  const handleStartGame = () => {
-    startNewGame();
+  const handleStartGame = async () => {
+    await startNewGame();
     router.push("/game");
   };
 
   /**
-   * Go to rules (placeholder)
+   * Go to rules
    */
   const handleRules = () => {
     router.push("/rules");
   };
+
+  // Show loading while hydrating
+  if (!isHydrated) {
+    return (
+      <View style={[styles.container, { paddingTop: insets.top }]}>
+        <View style={styles.content}>
+          <ActivityIndicator size="large" color="#FFFFFF" />
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       {/* Header with settings button */}
       <View style={styles.header}>
         <View style={styles.headerSpacer} />
-        <Pressable
+        {/* <Pressable
           style={styles.settingsButton}
           onPress={handleSettingsPress}
           hitSlop={12}
         >
           <IconSymbol name="gearshape.fill" size={26} color="#FFFFFF" />
-        </Pressable>
+        </Pressable> */}
       </View>
 
       {/* Main content */}
@@ -115,9 +144,7 @@ export default function MainMenuScreen() {
             style={[styles.button, styles.disabledButton]}
             onPress={handleSettingsPress}
           >
-            <Text style={[styles.buttonText]}>
-              inställningar
-            </Text>
+            <Text style={[styles.buttonText]}>inställningar</Text>
           </Pressable>
         </View>
       </View>
@@ -145,7 +172,7 @@ const styles = StyleSheet.create({
     height: 44,
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 22,
+    borderRadius: 0,
     backgroundColor: "rgba(255, 255, 255, 0.15)",
   },
   content: {
@@ -191,8 +218,8 @@ const styles = StyleSheet.create({
   /**
    * Byt namn på disabledButton till settingsButton kanske? Bättre att den ser färdig ut tänker jag!
    */
-  
-  disabledButton: { 
+
+  disabledButton: {
     borderColor: "#00A5E4",
   },
   buttonText: {
