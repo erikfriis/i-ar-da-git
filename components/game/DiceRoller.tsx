@@ -85,13 +85,16 @@ export const DiceRoller: React.FC<DiceRollerProps> = ({
    * Get a random face color for initial display (purely visual, doesn't affect outcome)
    */
   const getRandomInitialColor = (): string => {
-    const randomOutcome = ALL_OUTCOMES[Math.floor(Math.random() * ALL_OUTCOMES.length)];
+    const randomOutcome =
+      ALL_OUTCOMES[Math.floor(Math.random() * ALL_OUTCOMES.length)];
     return FACE_COLORS[randomOutcome];
   };
 
   // State
   const [isRolling, setIsRolling] = useState(false);
-  const [currentFaceColor, setCurrentFaceColor] = useState(() => getRandomInitialColor());
+  const [currentFaceColor, setCurrentFaceColor] = useState(() =>
+    getRandomInitialColor()
+  );
   const [finalOutcome, setFinalOutcome] = useState<DiceOutcome | null>(null);
 
   // Refs for intervals
@@ -111,7 +114,8 @@ export const DiceRoller: React.FC<DiceRollerProps> = ({
    * Pick a random face color for flickering (uses all colors for visual effect)
    */
   const pickRandomFaceColor = useCallback((): string => {
-    const randomOutcome = ALL_OUTCOMES[Math.floor(Math.random() * ALL_OUTCOMES.length)];
+    const randomOutcome =
+      ALL_OUTCOMES[Math.floor(Math.random() * ALL_OUTCOMES.length)];
     return FACE_COLORS[randomOutcome];
   }, []);
 
@@ -163,12 +167,12 @@ export const DiceRoller: React.FC<DiceRollerProps> = ({
 
     // Check if there are any available outcomes with cards
     const available = getAvailableOutcomes();
-    
+
     // If only choose-user and choose-opponent are available (all categories empty)
     const categoryOutcomes = available.filter(
       (o) => o !== "choose-user" && o !== "choose-opponent"
     );
-    
+
     if (categoryOutcomes.length === 0) {
       // All colored categories are empty - trigger popup
       onAllCategoriesEmpty?.();
@@ -198,24 +202,66 @@ export const DiceRoller: React.FC<DiceRollerProps> = ({
 
     // Rotate X - wobble
     rotateX.value = withSequence(
-      withTiming(25, { duration: ROLL_DURATION * 0.15, easing: Easing.inOut(Easing.quad) }),
-      withTiming(-20, { duration: ROLL_DURATION * 0.15, easing: Easing.inOut(Easing.quad) }),
-      withTiming(15, { duration: ROLL_DURATION * 0.15, easing: Easing.inOut(Easing.quad) }),
-      withTiming(-12, { duration: ROLL_DURATION * 0.15, easing: Easing.inOut(Easing.quad) }),
-      withTiming(8, { duration: ROLL_DURATION * 0.15, easing: Easing.inOut(Easing.quad) }),
-      withTiming(-4, { duration: ROLL_DURATION * 0.125, easing: Easing.inOut(Easing.quad) }),
-      withTiming(0, { duration: ROLL_DURATION * 0.1, easing: Easing.out(Easing.quad) })
+      withTiming(25, {
+        duration: ROLL_DURATION * 0.15,
+        easing: Easing.inOut(Easing.quad),
+      }),
+      withTiming(-20, {
+        duration: ROLL_DURATION * 0.15,
+        easing: Easing.inOut(Easing.quad),
+      }),
+      withTiming(15, {
+        duration: ROLL_DURATION * 0.15,
+        easing: Easing.inOut(Easing.quad),
+      }),
+      withTiming(-12, {
+        duration: ROLL_DURATION * 0.15,
+        easing: Easing.inOut(Easing.quad),
+      }),
+      withTiming(8, {
+        duration: ROLL_DURATION * 0.15,
+        easing: Easing.inOut(Easing.quad),
+      }),
+      withTiming(-4, {
+        duration: ROLL_DURATION * 0.125,
+        easing: Easing.inOut(Easing.quad),
+      }),
+      withTiming(0, {
+        duration: ROLL_DURATION * 0.1,
+        easing: Easing.out(Easing.quad),
+      })
     );
 
     // Rotate Y - wobble
     rotateY.value = withSequence(
-      withTiming(-20, { duration: ROLL_DURATION * 0.12, easing: Easing.inOut(Easing.quad) }),
-      withTiming(18, { duration: ROLL_DURATION * 0.15, easing: Easing.inOut(Easing.quad) }),
-      withTiming(-14, { duration: ROLL_DURATION * 0.15, easing: Easing.inOut(Easing.quad) }),
-      withTiming(10, { duration: ROLL_DURATION * 0.15, easing: Easing.inOut(Easing.quad) }),
-      withTiming(-6, { duration: ROLL_DURATION * 0.15, easing: Easing.inOut(Easing.quad) }),
-      withTiming(3, { duration: ROLL_DURATION * 0.14, easing: Easing.inOut(Easing.quad) }),
-      withTiming(0, { duration: ROLL_DURATION * 0.14, easing: Easing.out(Easing.quad) })
+      withTiming(-20, {
+        duration: ROLL_DURATION * 0.12,
+        easing: Easing.inOut(Easing.quad),
+      }),
+      withTiming(18, {
+        duration: ROLL_DURATION * 0.15,
+        easing: Easing.inOut(Easing.quad),
+      }),
+      withTiming(-14, {
+        duration: ROLL_DURATION * 0.15,
+        easing: Easing.inOut(Easing.quad),
+      }),
+      withTiming(10, {
+        duration: ROLL_DURATION * 0.15,
+        easing: Easing.inOut(Easing.quad),
+      }),
+      withTiming(-6, {
+        duration: ROLL_DURATION * 0.15,
+        easing: Easing.inOut(Easing.quad),
+      }),
+      withTiming(3, {
+        duration: ROLL_DURATION * 0.14,
+        easing: Easing.inOut(Easing.quad),
+      }),
+      withTiming(0, {
+        duration: ROLL_DURATION * 0.14,
+        easing: Easing.out(Easing.quad),
+      })
     );
 
     // Scale bounce
@@ -231,9 +277,18 @@ export const DiceRoller: React.FC<DiceRollerProps> = ({
 
     // Shadow change
     shadowRadius.value = withSequence(
-      withTiming(20, { duration: ROLL_DURATION * 0.3, easing: Easing.out(Easing.quad) }),
-      withTiming(8, { duration: ROLL_DURATION * 0.4, easing: Easing.inOut(Easing.quad) }),
-      withTiming(12, { duration: ROLL_DURATION * 0.3, easing: Easing.out(Easing.quad) })
+      withTiming(20, {
+        duration: ROLL_DURATION * 0.3,
+        easing: Easing.out(Easing.quad),
+      }),
+      withTiming(8, {
+        duration: ROLL_DURATION * 0.4,
+        easing: Easing.inOut(Easing.quad),
+      }),
+      withTiming(12, {
+        duration: ROLL_DURATION * 0.3,
+        easing: Easing.out(Easing.quad),
+      })
     );
 
     setTimeout(() => {
@@ -365,6 +420,7 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     textAlign: "center",
     lineHeight: 26,
+    minHeight: 60,
   },
 });
 
