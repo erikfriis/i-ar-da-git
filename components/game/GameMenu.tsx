@@ -52,14 +52,14 @@ export const GameMenu: React.FC<GameMenuProps> = ({
           </Pressable>
 
           {/* Settings - disabled placeholder */}
-          <Pressable
+          {/* <Pressable
             style={[styles.menuButton, styles.yellowButton]}
             onPress={onSettings}
           >
             <Text style={[styles.menuButtonText, styles.disabledText]}>
               inställningar
             </Text>
-          </Pressable>
+          </Pressable> */}
 
           {/* Account - disabled placeholder
           <Pressable
