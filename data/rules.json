@@ -7,27 +7,42 @@
   {
     "id": 2,
     "title": "Spelets gång",
-    "text": "Varje spelare tilldelas i tur och ordning ett händelsekort och läser upp det högt. Efter att ha läst upp händelsen noterar spelaren datumet för händelsen och några korta stödord på sitt svarsblock. Svarskortet placeras sedan på bordet framför respektive spelare. Datumet på svarskortet är spelaren startdatum."
+    "text": "Varje spelare tilldelas i tur och ordning ett händelsekort och läser upp det högt. Efter att ha läst upp händelsen noterar spelaren datumet för händelsen och några korta stödord på sitt svarsblock."
   },
   {
     "id": 3,
+    "title": "Spelets gång",
+    "text": "Svarskortet placeras sedan på bordet framför respektive spelare. Datumet på svarskortet är spelaren startdatum."
+  },
+  {
+    "id": 4,
     "title": "Vem börjar?",
     "text": "Bestäm vem som ska börja. Turen forstätter därefter medsols. Personen som spelar först slår tärningen, vars färg bestämmer kategori."
   },
   {
-    "id": 4,
+    "id": 5,
     "title": "Tärningens färger",
     "text": "Om tärningen visar vitt får du välja kategori. Om tärningen visar svart får kortläsaren välja kategori. Visar tärningen blått, gult, grönt eller lila tilldelas spelaren automatiskt en av de fyra kategorierna"
   },
   {
-    "id": 5,
+    "id": 6,
     "title": "Kortläsaren",
-    "text": "Kortläsaren är alltid den som sitter till höger om personen som ska svara. Kortläsaren trycker på 'visa händelsekort' och läser upp kortet högt. Spelaren som ska svara noterar händelsen på sitt svarsblock med några korta stödord. Därefter är utmaningen att bestämma om händelsen inträffade före eller efter datumet på spelarens startkort."
+    "text": "Kortläsaren är alltid den som sitter till höger om personen som ska svara. Kortläsaren trycker på 'visa händelsekort' och läser upp kortet högt."
   },
   {
-    "id": 6,
+    "id": 7,
+    "title": "Kortläsaren",
+    "text": "Spelaren som ska svara noterar händelsen på sitt svarsblock med några korta stödord. Därefter är utmaningen att bestämma om händelsen inträffade före eller efter datumet på spelarens startkort."
+  },
+  {
+    "id": 8,
     "title": "Placera händelser",
-    "text": "Om spelaren gissar rätt skrivs händelsens datum högst upp på svarskortet. Om händelsens datum är före startdatumet placeras svarskortet till vänster på bordet, om datumet är senare placeras det istället till höger. Aktiva svarskort placeras ca 5 cm högre upp på bordet i förhållande till låsta svarskort för att skilja korten åt"
+    "text": "Om spelaren gissar rätt skrivs händelsens datum högst upp på svarskortet. Om händelsens datum är före startdatumet placeras svarskortet till vänster på bordet, om datumet är senare placeras det istället till höger."
+  },
+  {
+    "id": 9,
+    "title": "Placera händelser",
+    "text": "Aktiva svarskort placeras ca 5 cm högre upp på bordet i förhållande till låsta svarskort för att skilja korten åt."
   }  
 ]
 

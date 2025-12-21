@@ -66,6 +66,7 @@ interface GameContextValue {
   // Flow state
   flowStep: FlowStep;
   setFlowStep: (step: FlowStep) => void;
+  previousFlowStep: FlowStep; // The step before entering discard-pile
   chooseCategoryMode: ChooseMode;
   setChooseCategoryMode: (mode: ChooseMode) => void;
   categoryResultId: string | null;
@@ -184,6 +185,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 
   // Flow state
   const [flowStep, setFlowStepInternal] = useState<FlowStep>("home");
+  const [previousFlowStep, setPreviousFlowStep] = useState<FlowStep>("dice");
   const [chooseCategoryMode, setChooseCategoryModeInternal] =
     useState<ChooseMode>(null);
   const [categoryResultId, setCategoryResultIdInternal] = useState<
@@ -402,8 +404,13 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 
   // Wrapped setters that persist
   const setFlowStep = useCallback((step: FlowStep) => {
+    // When transitioning TO discard-pile, save the current step as previous
+    // (unless we're already on discard-pile)
+    if (step === "discard-pile" && flowStep !== "discard-pile") {
+      setPreviousFlowStep(flowStep);
+    }
     setFlowStepInternal(step);
-  }, []);
+  }, [flowStep]);
 
   const setChooseCategoryMode = useCallback((mode: ChooseMode) => {
     setChooseCategoryModeInternal(mode);
@@ -785,6 +792,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     // Flow state
     flowStep,
     setFlowStep,
+    previousFlowStep,
     chooseCategoryMode,
     setChooseCategoryMode,
     categoryResultId,
