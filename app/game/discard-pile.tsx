@@ -1,6 +1,7 @@
 import { useRouter } from "expo-router";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import {
+  ActivityIndicator,
   Dimensions,
   FlatList,
   Pressable,
@@ -17,8 +18,7 @@ import Animated, {
 import { GameHeader } from "@/components/game/GameHeader";
 import { GameMenu } from "@/components/game/GameMenu";
 import { getCategoryById } from "@/constants/categories";
-import { useGame } from "@/context/GameContext";
-import { getFullAnswerDate, Question } from "@/hooks/useGameEngine";
+import { Question, useGame } from "@/context/GameContext";
 
 /**
  * Disable iOS back-swipe gesture to prevent gesture conflicts with FlatList
@@ -91,7 +91,7 @@ const MiniCard: React.FC<MiniCardProps> = ({ question, isActive, onPress }) => {
       >
         <View style={styles.miniCardOutline}>
           <Text style={styles.outlineDate}>{compactDate}</Text>
-          </View>
+        </View>
       </Pressable>
     );
   }
@@ -114,120 +114,216 @@ const MiniCard: React.FC<MiniCardProps> = ({ question, isActive, onPress }) => {
  * Discard Pile Screen
  * Shows completed cards with floating arrow navigation and mini card slider
  *
+ * INDEX CONVENTION:
+ * - discardIndex (context): 0 = oldest card, length-1 = newest card
+ * - visualIndex (slider): 0 = leftmost = newest, length-1 = rightmost = oldest
+ * - Conversion: visualIndex = length - 1 - discardIndex
+ *
  * SLIDER ORDER: Newest → Oldest (left → right)
  * - Leftmost mini card = most recently discarded
  * - Rightmost mini card = earliest discarded
  */
 export default function DiscardPileScreen() {
   const router = useRouter();
-  const { discardPile, getDiscardCard, endGame } = useGame();
+  const {
+    isHydrated,
+    discardPile,
+    discardIndex,
+    setDiscardIndex,
+    getDiscardCard,
+    endGame,
+    menuVisible,
+    setMenuVisible,
+    setFlowStep,
+  } = useGame();
+
   const flatListRef = useRef<FlatList>(null);
 
-  const [menuVisible, setMenuVisible] = useState(false);
-
-  // activeIndex: 0 = oldest, length-1 = newest (data index)
-  // Start at the LAST index (most recent card)
-  const [activeIndex, setActiveIndex] = useState(
-    discardPile.length > 0 ? discardPile.length - 1 : 0
-  );
-  const [currentCard, setCurrentCard] = useState<Question | null>(null);
+  // Track if we've done initial scroll to prevent repeated scrolls
+  const hasInitializedRef = useRef(false);
+  // Track last scrolled visual index to prevent unnecessary scroll calls
+  const lastScrolledVisualIndexRef = useRef<number | null>(null);
 
   // Animation for card transitions
   const cardOpacity = useSharedValue(1);
 
-  // Build array of all discarded questions for the slider
+  // Clamp discardIndex to valid range (derived, not state)
+  const pileLength = discardPile.length;
+  const clampedIndex =
+    pileLength > 0 ? Math.min(Math.max(0, discardIndex), pileLength - 1) : 0;
+
+  // Build array of all discarded questions for the slider using useMemo
   // ORDER: NEWEST FIRST (index 0 = newest, index length-1 = oldest)
-  // getDiscardCard(0) = newest, getDiscardCard(length-1) = oldest
-  const discardedQuestions: Question[] = discardPile
-    .map((_, idx) => getDiscardCard(idx))
-    .filter((q): q is Question => q !== null);
+  // This matches getDiscardCard(0) = newest
+  const discardedQuestions = useMemo<Question[]>(() => {
+    return discardPile
+      .map((_, idx) => getDiscardCard(idx))
+      .filter((q): q is Question => q !== null);
+  }, [discardPile, getDiscardCard]);
+
+  // Get current card directly from clamped index
+  // getDiscardCard uses reversed pile, so getDiscardCard(0) = newest
+  // We need: getDiscardCard(length - 1 - clampedIndex) to match our index convention
+  const currentCard = useMemo<Question | null>(() => {
+    if (pileLength === 0) return null;
+    return getDiscardCard(pileLength - 1 - clampedIndex);
+  }, [pileLength, clampedIndex, getDiscardCard]);
 
   /**
-   * Convert activeIndex (data) to visual index (slider position)
-   * activeIndex = length-1 (newest) → visualIndex = 0 (leftmost)
-   * activeIndex = 0 (oldest) → visualIndex = length-1 (rightmost)
+   * Convert discardIndex (data) to visual index (slider position)
+   * discardIndex = length-1 (newest) → visualIndex = 0 (leftmost)
+   * discardIndex = 0 (oldest) → visualIndex = length-1 (rightmost)
    */
-  const toVisualIndex = (dataIndex: number): number => {
-    return discardPile.length - 1 - dataIndex;
-  };
+  const toVisualIndex = useCallback(
+    (dataIndex: number): number => {
+      return pileLength - 1 - dataIndex;
+    },
+    [pileLength]
+  );
 
   /**
-   * Convert visual index (slider position) to activeIndex (data)
+   * Convert visual index (slider position) to discardIndex (data)
    */
-  const toDataIndex = (visualIndex: number): number => {
-    return discardPile.length - 1 - visualIndex;
-  };
+  const toDataIndex = useCallback(
+    (visualIndex: number): number => {
+      return pileLength - 1 - visualIndex;
+    },
+    [pileLength]
+  );
 
-  // Get the current card based on active index
+  // Current visual index for slider
+  const currentVisualIndex = toVisualIndex(clampedIndex);
+
+  // Update flow step when screen mounts (only once)
+  useEffect(() => {
+    if (isHydrated) {
+      setFlowStep("discard-pile");
+    }
+  }, [isHydrated, setFlowStep]);
+
+  // One-time initialization: clamp index and set to newest if invalid
+  useEffect(() => {
+    if (!isHydrated || pileLength === 0 || hasInitializedRef.current) return;
+
+    hasInitializedRef.current = true;
+
+    // If persisted index is out of bounds or 0 (default), show newest card
+    if (discardIndex < 0 || discardIndex >= pileLength) {
+      setDiscardIndex(pileLength - 1);
+    } else if (discardIndex === 0 && pileLength > 1) {
+      // If index is 0 but we have multiple cards, assume first visit - show newest
+      // Only do this if it looks like a fresh open (index at oldest)
+      // Actually, respect the persisted index if it's valid
+      // Just ensure it's clamped
+    }
+  }, [isHydrated, pileLength, discardIndex, setDiscardIndex]);
+
+  // Scroll to correct position when needed
   useEffect(() => {
     if (
-      discardPile.length > 0 &&
-      activeIndex >= 0 &&
-      activeIndex < discardPile.length
+      !flatListRef.current ||
+      discardedQuestions.length === 0 ||
+      !isHydrated
     ) {
-      const card = getDiscardCard(discardPile.length - 1 - activeIndex);
-      setCurrentCard(card);
-    } else {
-      setCurrentCard(null);
+      return;
     }
-  }, [activeIndex, discardPile, getDiscardCard]);
 
-  // Initialize to latest card when screen opens
-  useEffect(() => {
-    if (discardPile.length > 0) {
-      const latestIndex = discardPile.length - 1;
-      setActiveIndex(latestIndex);
+    const targetVisualIndex = currentVisualIndex;
+
+    // Only scroll if the visual index changed
+    if (lastScrolledVisualIndexRef.current === targetVisualIndex) {
+      return;
     }
-  }, [discardPile.length]);
 
-  // Scroll to active card's visual position when it changes
-  useEffect(() => {
-    if (flatListRef.current && discardedQuestions.length > 0) {
-      const visualIndex = toVisualIndex(activeIndex);
-      flatListRef.current.scrollToIndex({
-        index: visualIndex,
-        animated: true,
+    // Guard: ensure valid index
+    if (
+      targetVisualIndex < 0 ||
+      targetVisualIndex >= discardedQuestions.length
+    ) {
+      return;
+    }
+
+    lastScrolledVisualIndexRef.current = targetVisualIndex;
+
+    // Use requestAnimationFrame to ensure FlatList is ready
+    requestAnimationFrame(() => {
+      flatListRef.current?.scrollToIndex({
+        index: targetVisualIndex,
+        animated: hasInitializedRef.current,
         viewPosition: 0.5,
       });
-    }
-  }, [activeIndex, discardedQuestions.length]);
+    });
+  }, [currentVisualIndex, discardedQuestions.length, isHydrated]);
 
   /**
-   * Navigate to older card (left button)
+   * Navigate to older card (decrease discardIndex)
+   * Left arrow goes to older = lower discardIndex
    */
   const handlePrevious = useCallback(() => {
-    if (activeIndex > 0) {
+    if (clampedIndex > 0) {
+      const newIndex = clampedIndex - 1;
       cardOpacity.value = 0;
       cardOpacity.value = withTiming(1, { duration: 200 });
-      setActiveIndex(activeIndex - 1);
+      setDiscardIndex(newIndex);
     }
-  }, [activeIndex, cardOpacity]);
+  }, [clampedIndex, cardOpacity, setDiscardIndex]);
 
   /**
-   * Navigate to newer card (right button)
+   * Navigate to newer card (increase discardIndex)
+   * Right arrow goes to newer = higher discardIndex
    */
   const handleNext = useCallback(() => {
-    if (activeIndex < discardPile.length - 1) {
+    if (clampedIndex < pileLength - 1) {
+      const newIndex = clampedIndex + 1;
       cardOpacity.value = 0;
       cardOpacity.value = withTiming(1, { duration: 200 });
-      setActiveIndex(activeIndex + 1);
+      setDiscardIndex(newIndex);
     }
-  }, [activeIndex, discardPile.length, cardOpacity]);
+  }, [clampedIndex, pileLength, cardOpacity, setDiscardIndex]);
 
   /**
    * Handle mini card tap in slider
-   * Converts visual index to data index
+   * Converts visual index to data index and updates context
    */
   const handleMiniCardPress = useCallback(
     (visualIndex: number) => {
       const dataIndex = toDataIndex(visualIndex);
-      if (dataIndex !== activeIndex) {
+      if (
+        dataIndex !== clampedIndex &&
+        dataIndex >= 0 &&
+        dataIndex < pileLength
+      ) {
         cardOpacity.value = 0;
         cardOpacity.value = withTiming(1, { duration: 200 });
-        setActiveIndex(dataIndex);
+        setDiscardIndex(dataIndex);
       }
     },
-    [activeIndex, cardOpacity, discardPile.length]
+    [clampedIndex, pileLength, cardOpacity, setDiscardIndex, toDataIndex]
+  );
+
+  /**
+   * Handle scroll to index failure gracefully
+   * This can happen if FlatList isn't fully laid out yet
+   */
+  const handleScrollToIndexFailed = useCallback(
+    (info: {
+      index: number;
+      highestMeasuredFrameIndex: number;
+      averageItemLength: number;
+    }) => {
+      // Wait a bit and try again, but only once
+      const retryIndex = info.index;
+      setTimeout(() => {
+        if (flatListRef.current && retryIndex === currentVisualIndex) {
+          flatListRef.current.scrollToIndex({
+            index: retryIndex,
+            animated: false,
+            viewPosition: 0.5,
+          });
+        }
+      }, 100);
+    },
+    [currentVisualIndex]
   );
 
   // Animated styles for the main card
@@ -261,8 +357,19 @@ export default function DiscardPileScreen() {
     router.push("/settings");
   };
 
+  // Show loading while hydrating
+  if (!isHydrated) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.content}>
+          <ActivityIndicator size="large" color="#FFFFFF" />
+        </View>
+      </View>
+    );
+  }
+
   // If no cards in discard pile
-  if (discardPile.length === 0) {
+  if (pileLength === 0) {
     return (
       <View style={styles.container}>
         <GameHeader
@@ -293,14 +400,10 @@ export default function DiscardPileScreen() {
   }
 
   const category = currentCard ? getCategoryById(currentCard.category) : null;
-  const categoryColor = category?.color || "#7AD17A";
-  const fullAnswerDate = currentCard ? getFullAnswerDate(currentCard) : "";
 
-  const canGoPrevious = activeIndex > 0;
-  const canGoNext = activeIndex < discardPile.length - 1;
-
-  // Current visual index for isActive check
-  const currentVisualIndex = toVisualIndex(activeIndex);
+  // Arrow navigation: Left = older (lower index), Right = newer (higher index)
+  const canGoPrevious = clampedIndex > 0;
+  const canGoNext = clampedIndex < pileLength - 1;
 
   return (
     <View style={styles.container}>
@@ -322,9 +425,7 @@ export default function DiscardPileScreen() {
               {currentCard && (
                 <>
                   {/* Category header */}
-                  <View
-                    style={[styles.categoryHeader]}
-                  >
+                  <View style={[styles.categoryHeader]}>
                     <Text style={styles.categoryLabel}>{category?.label}</Text>
                   </View>
 
@@ -340,7 +441,7 @@ export default function DiscardPileScreen() {
                   <View style={styles.footer}>
                     <Text style={styles.footerTitle}>i år då?</Text>
                     <Text style={styles.positionIndicator}>
-                      {discardPile.length - activeIndex}
+                      {pileLength - clampedIndex}
                     </Text>
                   </View>
                 </>
@@ -348,7 +449,7 @@ export default function DiscardPileScreen() {
             </View>
           </Animated.View>
 
-          {/* Floating Left Arrow - goes to OLDER cards (right in slider) */}
+          {/* Floating Left Arrow - goes to OLDER cards */}
           <Pressable
             style={[
               styles.floatingArrow,
@@ -365,7 +466,7 @@ export default function DiscardPileScreen() {
             </Text>
           </Pressable>
 
-          {/* Floating Right Arrow - goes to NEWER cards (left in slider) */}
+          {/* Floating Right Arrow - goes to NEWER cards */}
           <Pressable
             style={[
               styles.floatingArrow,
@@ -396,17 +497,8 @@ export default function DiscardPileScreen() {
             bounces={false}
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.sliderContent}
-            keyExtractor={(item, index) => `discard-${item.id}-${index}`}
-            onScrollToIndexFailed={(info) => {
-              // Handle scroll failure gracefully
-              setTimeout(() => {
-                flatListRef.current?.scrollToIndex({
-                  index: info.index,
-                  animated: true,
-                  viewPosition: 0.5,
-                });
-              }, 100);
-            }}
+            keyExtractor={(item) => `discard-${item.id}`}
+            onScrollToIndexFailed={handleScrollToIndexFailed}
             renderItem={({ item, index }) => (
               <MiniCard
                 question={item}
@@ -465,8 +557,8 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     backgroundColor: "#1A1A1A",
     overflow: "hidden",
-    justifyContent: "center", 
-    alignItems: "center",  
+    justifyContent: "center",
+    alignItems: "center",
   },
 
   /**

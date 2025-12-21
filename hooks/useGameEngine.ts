@@ -28,29 +28,16 @@ export type RandomOutcome =
   | { type: "choose"; mode: "user" | "opponent" };
 
 /**
- * The 6 possible outcomes with equal probability
- */
-const OUTCOMES = [
-  { type: "category", categoryId: "prylar" }, // Yellow
-  { type: "category", categoryId: "personer" }, // Blue
-  { type: "category", categoryId: "underhallning" }, // Purple
-  { type: "category", categoryId: "blandat" }, // Green
-  { type: "choose", mode: "user" }, // White - user chooses
-  { type: "choose", mode: "opponent" }, // Black - opponent chooses
-] as const;
-
-/**
- * Minimum cards threshold before reshuffling category
- * When remaining cards < 5, reshuffle is triggered
- */
-const MIN_CARDS_THRESHOLD = 5;
-
-/**
  * Get the full answer date string (e.g., "17 juni 2025")
  */
 export const getFullAnswerDate = (question: Question): string => {
   return `${question.date} ${question.answer}`;
 };
+
+/**
+ * Category IDs for the 4 colored categories
+ */
+const CATEGORY_IDS = ["prylar", "personer", "underhallning", "blandat"];
 
 /**
  * Game Engine Hook
@@ -87,7 +74,7 @@ export const useGameEngine = () => {
   const [discardIndex, setDiscardIndex] = useState<number>(0);
 
   /**
-   * Start a new game - resets all state
+   * Start a new game - resets all state including discard pile
    */
   const startNewGame = useCallback(() => {
     setUsedQuestionsByCategory({
@@ -118,38 +105,6 @@ export const useGameEngine = () => {
     Object.values(usedQuestionsByCategory).some((arr) => arr.length > 0);
 
   /**
-   * Draw a random outcome (1/6 each, equal probability)
-   * Returns category to show result screen, or choose mode for user/opponent selection
-   */
-  const drawRandomOutcome = useCallback((): RandomOutcome => {
-    const randomIndex = Math.floor(Math.random() * OUTCOMES.length);
-    const outcome = OUTCOMES[randomIndex];
-
-    if (outcome.type === "choose") {
-      return { type: "choose", mode: outcome.mode };
-    }
-
-    return { type: "category", categoryId: outcome.categoryId };
-  }, []);
-
-  /**
-   * Set a specific category by ID
-   */
-  const selectCategoryById = useCallback((categoryId: string) => {
-    const category = getCategoryById(categoryId);
-    if (category) {
-      setCurrentCategory(category);
-    }
-  }, []);
-
-  /**
-   * Set a specific category
-   */
-  const selectCategory = useCallback((category: Category) => {
-    setCurrentCategory(category);
-  }, []);
-
-  /**
    * Get total questions in a category
    */
   const getTotalQuestionsInCategory = useCallback(
@@ -174,24 +129,97 @@ export const useGameEngine = () => {
   );
 
   /**
-   * Check if category needs reshuffling (less than 10 cards remaining)
+   * Check if a category is empty (has 0 remaining cards)
    */
-  const needsReshuffle = useCallback(
+  const isCategoryEmpty = useCallback(
     (categoryId: string): boolean => {
-      return getRemainingCards(categoryId) < MIN_CARDS_THRESHOLD;
+      return getRemainingCards(categoryId) === 0;
     },
     [getRemainingCards]
   );
 
   /**
-   * Reset used questions for a specific category only
-   * Does NOT affect discard pile
+   * Check if ALL categories are empty (game is fully out of cards)
    */
-  const resetUsedQuestionsForCategory = useCallback((categoryId: string) => {
-    setUsedQuestionsByCategory((prev) => ({
-      ...prev,
-      [categoryId]: [],
-    }));
+  const areAllCategoriesEmpty = useCallback((): boolean => {
+    return CATEGORY_IDS.every((id) => isCategoryEmpty(id));
+  }, [isCategoryEmpty]);
+
+  /**
+   * Get list of available outcomes for the dice
+   * Only includes categories that have remaining cards
+   * Always includes choose-user and choose-opponent
+   */
+  const getAvailableOutcomes = useCallback((): RandomOutcome[] => {
+    const outcomes: RandomOutcome[] = [];
+
+    // Add colored categories only if they have remaining cards
+    for (const categoryId of CATEGORY_IDS) {
+      if (!isCategoryEmpty(categoryId)) {
+        outcomes.push({ type: "category", categoryId });
+      }
+    }
+
+    // Always add choose options (vit/svart)
+    outcomes.push({ type: "choose", mode: "user" });
+    outcomes.push({ type: "choose", mode: "opponent" });
+
+    return outcomes;
+  }, [isCategoryEmpty]);
+
+  /**
+   * Draw a random outcome from available outcomes
+   * Skips empty categories
+   * Returns null if all categories are empty (should show popup instead)
+   */
+  const drawRandomOutcome = useCallback((): RandomOutcome | null => {
+    // If all categories are empty, return null to signal popup should be shown
+    if (areAllCategoriesEmpty()) {
+      return null;
+    }
+
+    const availableOutcomes = getAvailableOutcomes();
+
+    // This shouldn't happen since we always have choose-user and choose-opponent
+    if (availableOutcomes.length === 0) {
+      return null;
+    }
+
+    const randomIndex = Math.floor(Math.random() * availableOutcomes.length);
+    return availableOutcomes[randomIndex];
+  }, [areAllCategoriesEmpty, getAvailableOutcomes]);
+
+  /**
+   * Set a specific category by ID
+   */
+  const selectCategoryById = useCallback((categoryId: string) => {
+    const category = getCategoryById(categoryId);
+    if (category) {
+      setCurrentCategory(category);
+    }
+  }, []);
+
+  /**
+   * Set a specific category
+   */
+  const selectCategory = useCallback((category: Category) => {
+    setCurrentCategory(category);
+  }, []);
+
+  /**
+   * Reset used questions for ALL categories
+   * Does NOT affect discard pile - keeps full session history
+   * Used for "Blanda om leken" button
+   */
+  const resetAllUsedQuestions = useCallback(() => {
+    setUsedQuestionsByCategory({
+      prylar: [],
+      personer: [],
+      underhallning: [],
+      blandat: [],
+    });
+    setCurrentQuestion(null);
+    setCurrentCategory(null);
   }, []);
 
   /**
@@ -313,17 +341,11 @@ export const useGameEngine = () => {
 
   /**
    * Reset the round (clear all used questions but keep discard pile)
+   * Alias for resetAllUsedQuestions
    */
   const resetRound = useCallback(() => {
-    setUsedQuestionsByCategory({
-      prylar: [],
-      personer: [],
-      underhallning: [],
-      blandat: [],
-    });
-    setCurrentQuestion(null);
-    setCurrentCategory(null);
-  }, []);
+    resetAllUsedQuestions();
+  }, [resetAllUsedQuestions]);
 
   /**
    * End the game and return to idle state
@@ -335,21 +357,19 @@ export const useGameEngine = () => {
   }, []);
 
   /**
-   * Check if all questions in a category are used
+   * Check if all questions in a category are used (alias for isCategoryEmpty)
    */
   const isCategoryExhausted = useCallback(
     (categoryId: string): boolean => {
-      return getAvailableQuestions(categoryId).length === 0;
+      return isCategoryEmpty(categoryId);
     },
-    [getAvailableQuestions]
+    [isCategoryEmpty]
   );
 
   /**
    * Check if all questions are used across all categories
    */
-  const areAllQuestionsUsed = Object.keys(usedQuestionsByCategory).every(
-    (categoryId) => isCategoryExhausted(categoryId)
-  );
+  const areAllQuestionsUsed = areAllCategoriesEmpty();
 
   /**
    * Get total question count
@@ -400,13 +420,15 @@ export const useGameEngine = () => {
     getCurrentDiscardCard,
     getDiscardCard,
     resetRound,
-    resetUsedQuestionsForCategory,
+    resetAllUsedQuestions,
 
     // Utilities
     getAvailableQuestions,
+    getAvailableOutcomes,
     isCategoryExhausted,
+    isCategoryEmpty,
+    areAllCategoriesEmpty,
     getRemainingCards,
-    needsReshuffle,
     getTotalQuestionsInCategory,
     getTotalQuestions,
     getUsedCount,

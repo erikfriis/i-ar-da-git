@@ -1,43 +1,59 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useState } from "react";
-import { Dimensions, Pressable, StyleSheet, Text, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  LayoutChangeEvent,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 
 import { GameHeader } from "@/components/game/GameHeader";
 import { GameMenu } from "@/components/game/GameMenu";
-import { LowCardsPopup } from "@/components/game/LowCardsPopup";
-import { categories, getCategoryById } from "@/constants/categories";
+import { GamePopup } from "@/components/game/GamePopup";
+import { categories } from "@/constants/categories";
 import { useGame } from "@/context/GameContext";
 
-const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const GRID_PADDING = 24;
 const GRID_GAP = 16;
-const SQUARE_SIZE = (SCREEN_WIDTH - GRID_PADDING * 2 - GRID_GAP) / 2;
+const GRID_MAX_WIDTH = 480;
 
 /**
  * Choose Category Screen
  * Shown when outcome is "vit" (user chooses) or "svart" (opponent chooses)
  * User manually picks a category from a 2x2 grid
+ *
+ * If user taps an empty category, shows a popup explaining
+ * the category is out of cards.
  */
 export default function ChooseCategoryScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ mode: string }>();
   const mode = (params.mode as "user" | "opponent") || "user";
 
+  // Track measured grid container width for responsive sizing
+  const [gridWidth, setGridWidth] = useState<number>(0);
+
+  // Compute square size based on measured container width
+  const computedSize =
+    gridWidth > 0 ? (gridWidth - GRID_PADDING * 2 - GRID_GAP) / 2 : 150; // Default fallback before measurement
+  const squareSize = Math.max(120, Math.min(220, computedSize));
+
   const {
+    isHydrated,
     selectCategoryById,
     drawRandomQuestion,
-    getRemainingCards,
-    needsReshuffle,
-    resetUsedQuestionsForCategory,
+    isCategoryEmpty,
     getDiscardCount,
     endGame,
+    menuVisible,
+    setMenuVisible,
+    setFlowStep,
+    setChooseCategoryMode,
   } = useGame();
 
-  const [menuVisible, setMenuVisible] = useState(false);
-  const [showLowCardsPopup, setShowLowCardsPopup] = useState(false);
-  const [pendingCategoryId, setPendingCategoryId] = useState<string | null>(
-    null
-  );
+  const [showEmptyCategoryPopup, setShowEmptyCategoryPopup] = useState(false);
 
   const discardCount = getDiscardCount;
 
@@ -45,44 +61,51 @@ export default function ChooseCategoryScreen() {
   const title = mode === "opponent" ? "Motståndaren väljer" : "Du väljer";
   const subtitle = "kategori!";
 
-  /**
-   * Handle category selection
-   */
-  const handleSelectCategory = (categoryId: string) => {
-    // Check if category needs reshuffling
-    if (needsReshuffle(categoryId)) {
-      setPendingCategoryId(categoryId);
-      setShowLowCardsPopup(true);
-      return;
+  // Update flow step and store mode when screen mounts
+  useEffect(() => {
+    if (isHydrated) {
+      setFlowStep("choose-category");
+      setChooseCategoryMode(mode);
     }
+  }, [isHydrated, mode, setFlowStep, setChooseCategoryMode]);
 
-    proceedWithCategory(categoryId);
+  /**
+   * Handle layout measurement for responsive grid sizing
+   */
+  const handleGridLayout = (event: LayoutChangeEvent) => {
+    const { width } = event.nativeEvent.layout;
+    setGridWidth(width);
   };
 
   /**
-   * Proceed with category selection
+   * Handle category selection
+   * Shows popup if category is empty, otherwise proceeds to question
    */
-  const proceedWithCategory = (categoryId: string) => {
+  const handleSelectCategory = (categoryId: string) => {
+    // Check if category is empty
+    if (isCategoryEmpty(categoryId)) {
+      setShowEmptyCategoryPopup(true);
+      return;
+    }
+
+    // Category has cards - proceed
     selectCategoryById(categoryId);
     const question = drawRandomQuestion(categoryId);
 
     if (question) {
       router.push("/game/question");
     } else {
-      alert("Inga fler frågor i denna kategori!");
+      // This shouldn't happen if isCategoryEmpty works correctly
+      setShowEmptyCategoryPopup(true);
     }
   };
 
   /**
-   * Handle low cards popup confirmation
+   * Close the empty category popup
+   * User stays on choose-category screen
    */
-  const handleLowCardsConfirm = () => {
-    if (!pendingCategoryId) return;
-
-    setShowLowCardsPopup(false);
-    resetUsedQuestionsForCategory(pendingCategoryId);
-    proceedWithCategory(pendingCategoryId);
-    setPendingCategoryId(null);
+  const handleCloseEmptyPopup = () => {
+    setShowEmptyCategoryPopup(false);
   };
 
   /**
@@ -111,10 +134,16 @@ export default function ChooseCategoryScreen() {
     router.push("/settings");
   };
 
-  // Get category name for popup
-  const pendingCategory = pendingCategoryId
-    ? getCategoryById(pendingCategoryId)
-    : null;
+  // Show loading while hydrating
+  if (!isHydrated) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#FFFFFF" />
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -133,54 +162,89 @@ export default function ChooseCategoryScreen() {
         </View>
       </View>
 
-      {/* Category Grid - 2x2 */}
-      <View style={styles.gridContainer}>
-        <View style={styles.gridRow}>
-          {/* Yellow - Prylar */}
-          <Pressable
-            style={[
-              styles.categorySquare,
-              { backgroundColor: categories[0].color },
-            ]}
-            onPress={() => handleSelectCategory(categories[0].id)}
-          >
-            <Text style={styles.categoryLabel}>{categories[0].label}</Text>
-          </Pressable>
+      {/* Grid Outer - constrains width on large screens */}
+      <View style={styles.gridOuter}>
+        {/* Category Grid - 2x2 */}
+        <View style={styles.gridContainer} onLayout={handleGridLayout}>
+          <View style={styles.gridRow}>
+            {/* Yellow - Prylar */}
+            <Pressable
+              style={[
+                styles.categorySquare,
+                {
+                  width: squareSize,
+                  height: squareSize,
+                  backgroundColor: categories[0].color,
+                },
+                isCategoryEmpty(categories[0].id) && styles.categorySquareEmpty,
+              ]}
+              onPress={() => handleSelectCategory(categories[0].id)}
+            >
+              <Text style={styles.categoryLabel}>{categories[0].label}</Text>
+              {isCategoryEmpty(categories[0].id) && (
+                <Text style={styles.emptyBadge}>Slut</Text>
+              )}
+            </Pressable>
 
-          {/* Blue - Personer */}
-          <Pressable
-            style={[
-              styles.categorySquare,
-              { backgroundColor: categories[1].color },
-            ]}
-            onPress={() => handleSelectCategory(categories[1].id)}
-          >
-            <Text style={styles.categoryLabel}>{categories[1].label}</Text>
-          </Pressable>
-        </View>
+            {/* Blue - Personer */}
+            <Pressable
+              style={[
+                styles.categorySquare,
+                {
+                  width: squareSize,
+                  height: squareSize,
+                  backgroundColor: categories[1].color,
+                },
+                isCategoryEmpty(categories[1].id) && styles.categorySquareEmpty,
+              ]}
+              onPress={() => handleSelectCategory(categories[1].id)}
+            >
+              <Text style={styles.categoryLabel}>{categories[1].label}</Text>
+              {isCategoryEmpty(categories[1].id) && (
+                <Text style={styles.emptyBadge}>Slut</Text>
+              )}
+            </Pressable>
+          </View>
 
-        <View style={styles.gridRow}>
-          {/* Purple - Underhållning */}
-          <Pressable
-            style={[
-              styles.categorySquare,
-              { backgroundColor: categories[2].color },
-            ]}
-            onPress={() => handleSelectCategory(categories[2].id)}
-          >
-            <Text style={styles.categoryLabel}>{categories[2].label}</Text>
-          </Pressable>
+          <View style={styles.gridRow}>
+            {/* Purple - Underhållning */}
+            <Pressable
+              style={[
+                styles.categorySquare,
+                {
+                  width: squareSize,
+                  height: squareSize,
+                  backgroundColor: categories[2].color,
+                },
+                isCategoryEmpty(categories[2].id) && styles.categorySquareEmpty,
+              ]}
+              onPress={() => handleSelectCategory(categories[2].id)}
+            >
+              <Text style={styles.categoryLabel}>{categories[2].label}</Text>
+              {isCategoryEmpty(categories[2].id) && (
+                <Text style={styles.emptyBadge}>Slut</Text>
+              )}
+            </Pressable>
 
-          {/* Green - Blandat */}
-          <Pressable
-            style={[
-              styles.categorySquare,
-              { backgroundColor: categories[3].color },
-            ]}
-            onPress={() => handleSelectCategory(categories[3].id)}
-          >
-            <Text style={styles.categoryLabel}>{categories[3].label}</Text>
-          </Pressable>
+            {/* Green - Blandat */}
+            <Pressable
+              style={[
+                styles.categorySquare,
+                {
+                  width: squareSize,
+                  height: squareSize,
+                  backgroundColor: categories[3].color,
+                },
+                isCategoryEmpty(categories[3].id) && styles.categorySquareEmpty,
+              ]}
+              onPress={() => handleSelectCategory(categories[3].id)}
+            >
+              <Text style={styles.categoryLabel}>{categories[3].label}</Text>
+              {isCategoryEmpty(categories[3].id) && (
+                <Text style={styles.emptyBadge}>Slut</Text>
+              )}
+            </Pressable>
+          </View>
         </View>
       </View>
 
@@ -195,11 +259,19 @@ export default function ChooseCategoryScreen() {
         onContinue={() => setMenuVisible(false)}
       />
 
-      {/* Low Cards Popup */}
-      <LowCardsPopup
-        visible={showLowCardsPopup}
-        categoryName={pendingCategory?.label || ""}
-        onConfirm={handleLowCardsConfirm}
+      {/* Empty Category Popup */}
+      <GamePopup
+        visible={showEmptyCategoryPopup}
+        icon="🃏"
+        title="Kategorin är slut"
+        message="Denna kategori är slut. Avsluta och starta ett nytt spel för att blanda om högen."
+        buttons={[
+          {
+            label: "Okej",
+            onPress: handleCloseEmptyPopup,
+            variant: "primary",
+          },
+        ]}
       />
     </View>
   );
@@ -209,6 +281,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#D24662",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
   titleContainer: {
     alignItems: "center",
@@ -233,8 +310,14 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     marginTop: 4,
   },
-  gridContainer: {
+  gridOuter: {
     flex: 1,
+    width: "100%",
+    maxWidth: GRID_MAX_WIDTH,
+    alignSelf: "center",
+    justifyContent: "center",
+  },
+  gridContainer: {
     justifyContent: "center",
     paddingHorizontal: GRID_PADDING,
     gap: GRID_GAP,
@@ -245,8 +328,7 @@ const styles = StyleSheet.create({
     gap: GRID_GAP,
   },
   categorySquare: {
-    width: SQUARE_SIZE,
-    height: SQUARE_SIZE,
+    // width and height are set dynamically via inline style
     borderRadius: 16,
     justifyContent: "center",
     alignItems: "center",
@@ -257,11 +339,26 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 4,
   },
+  categorySquareEmpty: {
+    opacity: 0.5,
+  },
   categoryLabel: {
     fontSize: 15,
     fontWeight: "700",
     color: "#FFFFFF",
     textAlign: "center",
     lineHeight: 22,
+  },
+  emptyBadge: {
+    position: "absolute",
+    bottom: 12,
+    fontSize: 12,
+    fontWeight: "600",
+    color: "rgba(255, 255, 255, 0.9)",
+    backgroundColor: "rgba(0, 0, 0, 0.3)",
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8,
+    overflow: "hidden",
   },
 });
