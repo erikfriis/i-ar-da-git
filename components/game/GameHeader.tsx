@@ -2,6 +2,8 @@ import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { StackIcon } from "@/components/icons/StackIcon";
+
 interface GameHeaderProps {
   onMenuPress?: () => void;
   onDiscardPress?: () => void;
@@ -54,9 +56,8 @@ export const GameHeader: React.FC<GameHeaderProps> = ({
             onPress={onDiscardPress}
             hitSlop={12}
           >
-            <View style={styles.discardIcon}>
-              <View style={styles.discardCard} />
-              <View style={[styles.discardCard, styles.discardCardOffset]} />
+            <View style={styles.discardIconWrapper}>
+              <StackIcon width={28} height={40} />
             </View>
             {discardCount > 0 && (
               <View style={styles.badge}>
@@ -112,24 +113,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#A73349",
     borderRadius: 1.5,
   },
-  discardIcon: {
-    width: 24,
-    height: 28,
-    justifyContent: "flex-end",
-  },
-  discardCard: {
-    position: "absolute",
-    width: 18,
-    height: 24,
-    borderWidth: 2,
-    borderColor: "#A73349",
-    borderRadius: 4,
-    bottom: 0,
-    right: 0,
-  },
-  discardCardOffset: {
-    bottom: 4,
-    right: 4,
+  discardIconWrapper: {
+    justifyContent: "center",
+    alignItems: "center",
   },
   badge: {
     position: "absolute",
@@ -150,7 +136,7 @@ const styles = StyleSheet.create({
   },
   closeIcon: {
     fontSize: 24,
-    color: "#FFFFFF",
+    color: "#A73349", // Match hamburger/menu icon color
     fontWeight: "300",
   },
 });

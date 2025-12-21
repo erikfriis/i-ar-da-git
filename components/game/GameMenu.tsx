@@ -42,54 +42,48 @@ export const GameMenu: React.FC<GameMenuProps> = ({
       onRequestClose={onClose}
     >
       <View style={styles.overlay}>
-          <View style={styles.menuItems}>
-            {/* Rules - active */}
-            <Pressable
-              style={[styles.menuButton, styles.greenButton]}
-              onPress={onRules}
-            >
-              <Text style={styles.menuButtonText}>regler</Text>
-            </Pressable>
-
-            {/* Settings - disabled placeholder */}
-            <Pressable
-              style={[
-                styles.menuButton,
-                styles.yellowButton,
-              ]}
-              onPress={onSettings}
-            >
-              <Text style={[styles.menuButtonText, styles.disabledText]}>
-                inställningar
-              </Text>
-            </Pressable>
-
-            {/* Account - disabled placeholder */}
-            <Pressable
-              style={[
-                styles.menuButton,
-                styles.blueButton,
-              ]}
-              onPress={onAccount}
-            >
-              <Text style={[styles.menuButtonText, styles.disabledText]}>
-                konto
-              </Text>
-            </Pressable>
-
-            {/* End Game - active */}
-            <Pressable
-              style={[styles.menuButton, styles.outlineButton]}
-              onPress={onEndGame}
-            >
-              <Text style={styles.outlineButtonText}>avsluta</Text>
-            </Pressable>
-          </View>
-
-          {/* Continue button */}
-          <Pressable style={styles.continueButton} onPress={onContinue}>
-            <Text style={styles.continueButtonText}>Fortsätt</Text>
+        <View style={styles.menuItems}>
+          {/* Rules - active */}
+          <Pressable
+            style={[styles.menuButton, styles.greenButton]}
+            onPress={onRules}
+          >
+            <Text style={styles.menuButtonText}>regler</Text>
           </Pressable>
+
+          {/* Settings - disabled placeholder */}
+          <Pressable
+            style={[styles.menuButton, styles.yellowButton]}
+            onPress={onSettings}
+          >
+            <Text style={[styles.menuButtonText, styles.disabledText]}>
+              inställningar
+            </Text>
+          </Pressable>
+
+          {/* Account - disabled placeholder
+          <Pressable
+            style={[styles.menuButton, styles.blueButton]}
+            onPress={onAccount}
+          >
+            <Text style={[styles.menuButtonText, styles.disabledText]}>
+              konto
+            </Text>
+          </Pressable> */}
+
+          {/* End Game - active */}
+          <Pressable
+            style={[styles.menuButton, styles.outlineButton]}
+            onPress={onEndGame}
+          >
+            <Text style={styles.outlineButtonText}>avsluta</Text>
+          </Pressable>
+        </View>
+
+        {/* Continue button */}
+        <Pressable style={styles.continueButton} onPress={onContinue}>
+          <Text style={styles.continueButtonText}>Fortsätt</Text>
+        </Pressable>
       </View>
     </Modal>
   );
@@ -98,7 +92,7 @@ export const GameMenu: React.FC<GameMenuProps> = ({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.8)",
+    backgroundColor: "rgba(0, 0, 0, 0.722)",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -106,6 +100,7 @@ const styles = StyleSheet.create({
   menuItems: {
     width: "100%",
     gap: 20,
+    paddingHorizontal: 24,
   },
   menuButton: {
     paddingVertical: 14,
@@ -135,7 +130,8 @@ const styles = StyleSheet.create({
   disabledText: {
     opacity: 1,
   },
-  outlineButtonText: { // * Borde byta namn till "purpleButton"
+  outlineButtonText: {
+    // * Borde byta namn till "purpleButton"
     fontSize: 16, // * Borde byta namn till "purpleButton"
     fontWeight: "600",
     color: "#FFFFFF",
