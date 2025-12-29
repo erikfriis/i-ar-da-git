@@ -38,7 +38,7 @@
     "id": 6,
     "category": "prylar",
     "date": "29 oktober",
-    "event": "Datachipföretaget Nvidia först i världen med att nå ett marknadsvärde på fem biljoner dollar.",
+    "event": "Datachipföretaget Nvidia blir först i världen med att nå ett marknadsvärde på fem biljoner dollar. En biljon motsvarar tusen miljarder, alternativt en miljon miljoner.",
     "answer": "2025"
   },
   {
@@ -178,7 +178,7 @@
     "id": 26,
     "category": "personer",
     "date": "2 september",
-    "event": "USA genomför det första av totalt X dödliga tillslag mot misstänkt knarksmuggling på internationellt vatten.",
+    "event": "USA genomför det första av totalt 22 dödliga tillslag mot misstänkta knarksmugglingare från Venezuela. Attackerna sker på internationellt vatten.",
     "answer": "2025"
   },
   {
@@ -262,7 +262,7 @@
     "id": 38,
     "category": "underhallning",
     "date": "15 januari",
-    "event": "Regissören och manusförfattaren David Lynch avlider, 78 år gammal.",
+    "event": "Regissören och hjärnan bland annat Twin Peaks, David Lynch avlider, 78 år gammal.",
     "answer": "2025"
   },
   {
@@ -423,7 +423,7 @@
     "id": 61,
     "category": "underhallning",
     "date": "17 oktober",
-    "event": "Skådespelaren Jacob Ericksson avlider, 58 år gammal.",
+    "event": "Skådespelaren Jacob Ericksson avlider, 58 år gammal. En av Erikssons mest folkkära roller är den som polisen i Göran i filmen 'Tsatsiki, morsan och polisen'.",
     "answer": "2025"
   },
   {
@@ -437,7 +437,7 @@
     "id": 63,
     "category": "blandat",
     "date": "17 januari",
-    "event": "Återuppbyggnaden av vattenlandet Oceana i Göteborg påbörjas på nytt.",
+    "event": "Återuppbyggnaden av vattenlandet Oceana i Göteborg påbörjas.",
     "answer": "2025"
   },
   {
@@ -479,14 +479,301 @@
     "id": 69,
     "category": "blandat",
     "date": "15 september",
-    "event": "Armand Duplantis höjer världsrekordet för fjärde gången i år genom att klara 6,30 meter.",
+    "event": "Armand Duplantis höjer världsrekordet i stavhopp för fjärde gången i år genom att klara 6,30 meter.",
     "answer": "2025"
   },
   {
     "id": 70,
     "category": "blandat",
     "date": "9 november",
-    "event": "Mjällby tar hem Allsvenskan och slår nytt poängrekord med totalt 75 poäng.",
+    "event": "Mjällbys herrlag tar hem Allsvenskan och slår nytt poängrekord med totalt 75 poäng.",
+    "answer": "2025"
+  },
+  {
+    "id": 71,
+    "category": "blandat",
+    "date": "24 januari",
+    "event": "Parisa Liljestrand blir utbuad på Göteborgs filmfestival.",
+    "answer": "2025"
+  },
+  {
+    "id": 72,
+    "category": "personer",
+    "date": "27 januari",
+    "event": "Henrik Landerholm lämnar tjänsten som nationell säkerhetsrådgivare efter att ha tappat bort “allt”, däribland hemlighetsstämplade dokument.",
+    "answer": "2025"
+  },
+  {
+    "id": 73,
+    "category": "prylar",
+    "date": "16 februari",
+    "event": "Bojkotten av de tre stora matjättarna ICA, Axfood och Coop inleds i protest mot de höga matpriserna.",
+    "answer": "2025"
+  },
+  {
+    "id": 74,
+    "category": "prylar",
+    "date": "18 februari",
+    "event": "Aftonbladet avslöjsar att anställda på hamburgarrestaurangen Max rengör toaringar och sopborstar i diskmaskinen.",
+    "answer": "2025"
+  },
+  {
+    "id": 75,
+    "category": "underhallning",
+    "date": "21 mars",
+    "event": "Kent genomför den första av tre återföreningskonserter på Tele2 Arena.",
+    "answer": "2025"
+  },
+  {
+    "id": 76,
+    "category": "prylar",
+    "date": "8 maj",
+    "event": "Henrik Landerholms efterträdare, Tobias Thyberg, hamnar i blåsväder bara 30 minuter efter att ha tillträtt som nationell säkerhetsrådgivare. Detta efter att bilder från Thynbergs Grinder-profil läckt ut.",
+    "answer": "2025"
+  },
+  {
+    "id": 77,
+    "category": "underhallning",
+    "date": "23 maj",
+    "event": "Premiär för Mission Impossible - The final Reconning, den åttonde i filmserien med Tom Cruises i huvudrollen.",
+    "answer": "2025"
+  },
+  {
+    "id": 78,
+    "category": "personer",
+    "date": "26 maj",
+    "event": "Socialdemokraterna får böter på tre miljoner kronor efter att ha brutit mot spellagen i verksamheten med Kombispel.",
+    "answer": "2025"
+  },
+  {
+    "id": 79,
+    "category": "prylar",
+    "date": "1 juni",
+    "event": "Gårdsförsäljning av alkohol blir tillåtet i Sverige.",
+    "answer": "2025"
+  },
+  {
+    "id": 80,
+    "category": "prylar",
+    "date": "26 juni",
+    "event": "SD ger ut sin vitbok under Almedalsveckan.",
+    "answer": "2025"
+  },
+  {
+    "id": 81,
+    "category": "prylar",
+    "date": "1 juli",
+    "event": "Köp av sexuella tjänster online förbjuds i Sverige enligt en ny lag",
+    "answer": "2025"
+  },
+  {
+    "id": 82,
+    "category": "personer",
+    "date": "9 september",
+    "event": "Nya sjukvårdsministern Elisabet Lann svimmar i live-TV och Ebba Busch och Ulf Kristersson visar hur man ska och inte ska reagera vid en kris.",
+    "answer": "2025"
+  },
+  {
+    "id": 83,
+    "category": "prylar",
+    "date": "7 oktober",
+    "event": "Migrationsministern Johan Forssell meddelar att han inte har några planer på att avgå. Detta omkring tre månader efter Expos avslöjande om ministerns sons kopplingar till högerextremism.",
+    "answer": "2025"
+  },
+  {
+    "id": 84,
+    "category": "personer",
+    "date": "22 december",
+    "event": "Polisen beslutar att det så kallade JLC-guldet ska lämnas ut. Guld- och platinatackorna hittades under en renovering i Mölndal år 2023 och blev ämnet för en omfattande rättstvist.",
+    "answer": "2025"
+  },
+  {
+    "id": 85,
+    "category": "personer",
+    "date": "27 januari",
+    "event": "Henrik Landerholm lämnar tjänsten som nationell säkerhetsrådgivare efter att ha tappat bort “allt”, däribland hemlighetsstämplade dokument.",
+    "answer": "2025"
+  },
+  {
+    "id": 86,
+    "category": "blandat",
+    "date": "6 mars",
+    "event": "Skid-VM i Trondheim avslutas, det svenska damlandslaget åker hem med hela 6 guld.",
+    "answer": "2025"
+  },
+  {
+    "id": 87,
+    "category": "blandat",
+    "date": "2 december",
+    "event": "David Åhman och Jonatan Hellvig tilldelas Bragdguldet 2025 för duons framstående prestationer i beachvolleyboll.",
+    "answer": "2025"
+  },
+  {
+    "id": 88,
+    "category": "blandat",
+    "date": "14 september",
+    "event": "Andreas Almgren blir första svensk sedan 50-talet att ta VM-medalj i långdistanslöpning med sitt brons på 10 000 meter i Tokyo.",
+    "answer": "2025"
+  },
+  {
+    "id": 89,
+    "category": "blandat",
+    "date": "4 mars",
+    "event": "Guinness rekordbok utser Grand Ring till världens största träbyggnad. Den ca 20 meter höga konstruktionen täcker en yta på 61 0000 kvadratmeter.",
+    "answer": "2025"
+  },
+  {
+    "id": 90,
+    "category": "blandat",
+    "date": "18 november",
+    "event": "Svenska herrlandslaget spelar oavgjort mot Slovenien och slutar sist i sin VM-kvalgrupp.",
+    "answer": "2025"
+  },
+  {
+    "id": 91,
+    "category": "blandat",
+    "date": "23 november",
+    "event": "Örebro lyckas hålla sig kvar i Superettan efter att besegra Hammarby TTF i en straffrysare. Detta trots en säsong med hela 21 matcher i rad utan vinst.",
+    "answer": "2025"
+  },
+  {
+    "id": 92,
+    "category": "blandat",
+    "date": "8 juni",
+    "event": "18-åriga Aron Sjölund blir den yngsta Robinsonvinnaren i världen när finalen av realityprogrammet sänds i TV4.",
+    "answer": "2025"
+  },
+  {
+    "id": 93,
+    "category": "blandat",
+    "date": "29 oktober",
+    "event": "Ulf Kristersson hamnar i blåsväder efter att Aftonbladet publicerat uppgifter om att statsministerns dotter anordnat en studentfest på Harpsund.",
+    "answer": "2025"
+  },
+  {
+    "id": 94,
+    "category": "blandat",
+    "date": "4 november",
+    "event": "Onlineföretaget Shein stoppar all försäljning av sexdockor efter att det uppdagats att vissa av dockorna liknar barn.",
+    "answer": "2025"
+  },
+  {
+    "id": 95,
+    "category": "blandat",
+    "date": "2 september",
+    "event": "Sveriges nya kulturkanon publiceras.",
+    "answer": "2025"
+  },
+  {
+    "id": 96,
+    "category": "blandat",
+    "date": "20 januari",
+    "event": "Sarah Sjöström tar emot pris som årets kvinnliga idrottare på Idrottsgalan 2025.",
+    "answer": "2025"
+  },
+  {
+    "id": 97,
+    "category": "blandat",
+    "date": "14 december",
+    "event": "Svenska damlandslaget i innebandy snuvas på sitt tionde VM-guld i rad när Schweiz slår ut dem i semifinalen.",
+    "answer": "2025"
+  },
+  {
+    "id": 98,
+    "category": "blandat",
+    "date": "30 september",
+    "event": "Open AI släpper Sora 2, ett verktyg för att generera videos. I den nya uppdateringen kan användare använda en handfull kända personers ansikten, däribland youtubern Jake Paul.",
+    "answer": "2025"
+  },
+  {
+    "id": 99,
+    "category": "prylar",
+    "date": "6 mars",
+    "event": "Hazelight Studios, med Josef Fares i spetsen, släpper multiplayerspel Split Fiction.",
+    "answer": "2025"
+  },
+  {
+    "id": 100,
+    "category": "prylar",
+    "date": "5 juni",
+    "event": "Nintendo Switch 2 lanseras globalt.",
+    "answer": "2025"
+  },
+  {
+    "id": 101,
+    "category": "prylar",
+    "date": "",
+    "event": "Uppföljaren till succén Hollow Knight, Hollow Knight: Silksong, släpps.",
+    "answer": "2025"
+  },
+  {
+    "id": 102,
+    "category": "prylar",
+    "date": "18 september",
+    "event": "Ig Nobel-priset tilldelas Tomoki Kojima for demonstrating that painting cows with zebra-like stripes reduces fly bites.",
+    "answer": "2025"
+  },
+  {
+    "id": 103,
+    "category": "prylar",
+    "date": "3 oktober",
+    "event": "Trots tidigare löften meddelar miljöminister Romina Pourmokthari att hon inte kommer avgå. Detta efter att Naturvårdsverket konstaterat att Sverige ser ut att missa både sina egna och EUs miljömål för 2030.",
+    "answer": "2025"
+  },
+  {
+    "id": 104,
+    "category": "prylar",
+    "date": "6 november",
+    "event": "Till mångas besvikelse meddelar spelföretaget Rockstar Games att lanseringen av GTA 6 skjuts upp till hösten 2026.",
+    "answer": "2025"
+  },
+  {
+    "id": 105,
+    "category": "prylar",
+    "date": "10 november",
+    "event": "FN:s klimatkonferens 2025 inleds i Belém, Brasilien.",
+    "answer": "2025"
+  },
+  {
+    "id": 106,
+    "category": "prylar",
+    "date": "13 november",
+    "event": "HUI research utser “vuxenleksaken” till årets julklapp. Med det menar man avancerade byggsatser, målarböcker med detaljerade mönster eller leksaksfigurer som också kan vara samlarobjekt.",
+    "answer": "2025"
+  },
+  {
+    "id": 107,
+    "category": "prylar",
+    "date": "29 november",
+    "event": "Gävle-bocken brinner upp för första gånger på fyra år.",
+    "answer": "2025"
+  },
+  {
+    "id": 108,
+    "category": "prylar",
+    "date": "16 september",
+    "event": "Gängkriminella använder Pokemonkort för att locka unga. Detta meddelar Expressen i en artikel.",
+    "answer": "2025"
+  },
+  {
+    "id": 109,
+    "category": "prylar",
+    "date": "1 december",
+    "event": "Oxford University Press utser substantivet “rage bait” till årets ord.",
+    "answer": "2025"
+  },
+  {
+    "id": 110,
+    "category": "prylar",
+    "date": "20 april",
+    "event": "Med över 40 graders skillnad i norr och söder konstaterar SMHI att Sverige temperaturmässigt befinner sig i tre olika årstider samtidigt.",
+    "answer": "2025"
+  },
+  {
+    "id": 111,
+    "category": "prylar",
+    "date": "16 april",
+    "event": "För första gången på 100 år lyckas en grupp forskare fånga en kolossbläckfisk på film, 600 meter under ytan i södra Atlanten.",
     "answer": "2025"
   }
 ]
