@@ -72,7 +72,7 @@ export const GameHeader: React.FC<GameHeaderProps> = ({
             onPress={onClosePress}
             hitSlop={12}
           >
-            <Text style={styles.closeIcon}>✕</Text>
+            <Text style={styles.closeIcon}>x</Text>
           </Pressable>
         )}
       </View>
@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
   },
   closeIcon: {
-    fontSize: 24,
+    fontSize: 40,
     color: "#A73349", // Match hamburger/menu icon color
     fontWeight: "300",
   },
