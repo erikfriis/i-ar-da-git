@@ -343,7 +343,7 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   categoryLabel: {
-    fontSize: 15,
+    fontSize: 22,
     fontWeight: "700",
     color: "#FFFFFF",
     textAlign: "center",
