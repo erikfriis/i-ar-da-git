@@ -1,38 +1,128 @@
 [
   {
     "id": 1,
-    "title": "Förberedelser",
-    "text": "Alla spelare får varsitt svarsblock och en penna. Se till att alla har tillräckligt med utrymme för att lägga ut tio svarskort på bordet framför er."
+    "title": "Vad är I år då?",
+    "text": "I år då är en spin-off på det klassiska spelet När då då?. I stället för världshistoria handlar det om det senaste året. Uppgiften är att placera olika händelser rätt i tiden någonstans mellan 31 januari och 31 december."
   },
   {
     "id": 2,
-    "title": "Spelets gång",
-    "text": "Varje person tilldelas ett händelsekort och läser upp det högt. Efter att ha läst upp händelsen skriver spelaren datumet på ett svarskort och sammanfattar händelsen med några korta ord. Svarskortet placeras sedan på bordet framför respektive spelare. Datumet på svarskortet är spelaren startdatum."
+    "title": "Vad är I år då?",
+    "text": "Reglerna är snarlika så om ni spelat När då då? kommer det gå fort att lära sig!"
   },
   {
     "id": 3,
-    "title": "Vem börjar?",
-    "text": "Bestäm vem som ska börja. Turen forstätter därefter medsols. Personen som spelar först slår tärningen, vars färg bestämmer kategori."
+    "title": "Vem vinner?",
+    "text": "First things first. Den spelare eller det lag som först lyckas bilda en tidslinje med åtta kort i kronologisk ordning har vunnit."
   },
   {
     "id": 4,
-    "title": "Tärningens färger",
-    "text": "Om tärningen visar vitt får du välja kategori. Om tärningen visar svart får kortläsaren välja kategori. Visar tärningen blått, gult, grönt eller lila tilldelas spelaren automatiskt en av de fyra kategorierna"
+    "title": "Förberedelser",
+    "text": "Förbered 10-20 svarskort per spelare. För en bra storlek kan du klippa A4-papper i 16-delar."
   },
   {
     "id": 5,
-    "title": "Kortläsaren",
-    "text": "Kortläsaren är alltid den som sitter till höger om personen som ska svara. Kortläsaren trycker på 'visa händelsekort' och läser upp kortet högt. Spelaren som ska svara noterar händelsen på sitt svarsblock med några korta stödord. Därefter är utmaningen att bestämma om händelsen inträffade före eller efter datumet på spelarens startkort."
+    "title": "Förberedelser",
+    "text": "Se till att alla har tillräckligt med utrymme för att lägga ut tio svarskort på bordet framför sig."
   },
   {
     "id": 6,
-    "title": "Placera händelser",
-    "text": "Om spelaren gissar rätt skrivs händelsens datum högst upp på svarskortet. Om händelsens datum är före startdatumet placeras svarskortet till vänster på bordet, om datumet är senare placeras det istället till höger. Aktiva svarskort placeras ca 5 cm högre upp på bordet i förhållande till låsta svarskort för att skilja korten åt"
+    "title": "Hur många spelare?",
+    "text": "Vi rekommenderar högst fyra spelare för att frågorna ska räcka, det här är ju trots allt en demo. Är ni fler än fyra funkar det fint att spela i lag!"
   },
     {
     "id": 7,
+    "title": "Spelets gång",
+    "text": "Varje person tilldelas ett händelsekort som de läser upp högt. Datumet på svarskortet är spelarens startdatum."
+  },
+  {
+    "id": 8,
+    "title": "Spelets gång",
+    "text": "Efter att ha läst upp händelsen skriver spelaren datumet högst upp på ett svarskort och sammanfattar händelsen med några korta ord. Tänk på att skriva tydligt så alla kan se."
+  },
+  {
+    "id": 9,
+    "title": "Vem börjar?",
+    "text": "Yngst börjar! Turen fortsätter därefter medsols. Personen som spelar först slår tärningen, vars färg bestämmer kategori."
+  },
+  {
+    "id": 10,
+    "title": "Tärningens färger",
+    "text": "Om tärningen visar blått, gult, grönt eller lila tilldelas spelaren automatiskt en av de fyra kategorierna."
+  },
+  {
+    "id": 11,
+    "title": "Tärningens färger",
+    "text": "Om tärningen visar vitt eller svart får du eller dina motspelare välja kategori. "
+  },
+  {
+    "id": 12,
+    "title": "Uppläsaren",
+    "text": "Den som läser händelsekortet är alltid personen till höger om spelaren som ska svara. Spelaren som ska svara sammanfattar händelsen i mitten av svarskortet med några korta stödord. (Tänk på att lämna plats åt datumet högst upp)"
+  },
+  {
+    "id": 13,
+    "title": "Uppläsaren",
+    "text": "Därefter är utmaningen att bestämma om händelsen inträffade före eller efter datumet på spelarens startkort."
+  },
+  {
+    "id": 14,
     "title": "Placera händelser",
-    "text": "nya regler här"
-  }  
+    "text": "Om spelaren gissar rätt skrivs händelsens datum högst upp på svarskortet. Om händelsens datum är före startdatumet placeras svarskortet till vänster på bordet, om datumet är senare placeras det istället till höger."
+  },
+  {
+    "id": 15,
+    "title": "Uppläsaren",
+    "text": "Aktiva svarskort placeras ca 5 cm högre upp på bordet i förhållande till låsta svarskort för att skilja korten åt."
+  },
+  {
+    "id": 16,
+    "title": "Dra fler kort",
+    "text": "Spelaren får fortsätta att dra nya kort tills personen svarar fel. Ju fler kort som spelaren har framför sig, både aktiva och låsta, desto svårare blir det."
+  },
+  {
+    "id": 17,
+    "title": "Dra fler kort",
+    "text": "För att svara rätt behöver spelaren bestämma om kortet ska placeras före, efter eller mellan de redan utlagda korten."
+  },
+  {
+    "id": 18,
+    "title": "Låsa in eller fortsätta ",
+    "text": "Efter varje rätt svar har spelaren möjlighet att välja om den vill fortsätta spela eller låsa in de aktiva korten. Spelaren måste bestämma sig för att fortsätta eller låsa in innan ett nytt kort dragits. Turen går sedan vidare till nästa spelare."
+  },
+  {
+    "id": 19,
+    "title": "Låsta kort",
+    "text": "Om du väljer att låsa dina aktiva kort placerar flyttar du ner dem så att de ligger på samma höjd som ditt startkort. Du kan aldrig förlora kort som du låst."
+  },
+  {
+    "id": 20,
+    "title": "Fel svar",
+    "text": "Om du svarar fel förlorar du dina olåsta, aktiva kort, dessa kort tas ur spelet. Kortet du svarat fel på läses på nytt upp och nästa spelare på tur har nu möjlighet att svara rätt och vinna kortet till sin tidslinje."
+  },
+  {
+    "id": 21,
+    "title": "Fel svar",
+    "text": "Om denna spelare också svarar fel, går kortet vidare till nästa spelare och så vidare. Kortet går vidare runt bordet ända till någon svarar rätt. Även den som först svarade fel får alltså svara igen."
+  },
+  {
+    "id": 22,
+    "title": "Att vinna någon annans kort",
+    "text": "Personen som svarar rätt noterar datumet på svarskortet och placerar det sedan som låst på sin tidslinje. Spelrundan är därmed avslutad."
+  },
+  {
+    "id": 23,
+    "title": "Två deltagare",
+    "text": "Om endast två personer eller lag deltar går ett missat kort inte vidare. Vid felaktiga svar går turen istället direkt vidare till motspelaren."
+  },
+  {
+    "id": 24,
+    "title": "Samma datum",
+    "text": "Det kan hända att ett kort som du ska gissa på har samma datum som ett kort som redan ligger på din tidslinje. Det spelar i sådana fall ingen roll om kortet placeras före eller efter det aktuella kortet. Båda svaren räknas som rätt."
+  },
+  {
+    "id": 25,
+    "title": "Hälsningar från moderatorerna",
+    "text": "Tack för att ni vill va med och testspela vårat spel! Skriv gärna ner några rader om vad ni tyckte om spelupplevelsen, om det var något som kändes oklart eller om appen buggade :) Gott nytt år!!"
+  }      
 ]
 
