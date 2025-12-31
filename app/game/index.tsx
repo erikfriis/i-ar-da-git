@@ -1,7 +1,6 @@
 import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import { DiceOutcome, DiceRoller } from "@/components/game/DiceRoller";
 import { GameHeader } from "@/components/game/GameHeader";
@@ -10,15 +9,15 @@ import { GamePopup } from "@/components/game/GamePopup";
 import { useGame } from "@/context/GameContext";
 
 /**
- * Category Selection Screen - "Slumpa kategori"
+ * Dice Roll Screen - "Slumpa kategori"
  *
  * Uses an animated dice roll to select one of 6 outcomes:
- * - Yellow (prylar) → category result screen
- * - Blue (personer) → category result screen
- * - Purple (underhållning) → category result screen
- * - Green (blandat) → category result screen
- * - White (vit) → choose category (user picks)
- * - Black (svart) → choose category (opponent picks)
+ * - Yellow (prylar) → directly to question card
+ * - Blue (personer) → directly to question card
+ * - Purple (underhållning) → directly to question card
+ * - Green (blandat) → directly to question card
+ * - White (vit) → choose category screen (user picks)
+ * - Black (svart) → choose category screen (opponent picks)
  *
  * The dice only lands on categories that have remaining cards.
  * If all categories are empty, shows "Alla kort är slut" popup.
@@ -34,6 +33,8 @@ export default function CategoryScreen() {
     menuVisible,
     setMenuVisible,
     setFlowStep,
+    selectCategoryById,
+    drawRandomQuestion,
   } = useGame();
 
   const discardCount = getDiscardCount;
@@ -93,6 +94,8 @@ export default function CategoryScreen() {
   /**
    * Handle dice roll completion
    * Maps DiceOutcome to navigation
+   * - Colored categories: Go directly to question (skip category-result screen)
+   * - White/Black: Go to choose-category screen
    */
   const handleRollComplete = useCallback(
     (outcome: DiceOutcome) => {
@@ -107,13 +110,20 @@ export default function CategoryScreen() {
           params: { mode: "opponent" },
         });
       } else {
-        router.push({
-          pathname: "/game/category-result",
-          params: { categoryId: outcome },
-        });
+        // Colored category - go directly to question
+        selectCategoryById(outcome);
+        const question = drawRandomQuestion(outcome);
+
+        if (question) {
+          router.push("/game/question");
+        } else {
+          // This shouldn't happen since dice only lands on non-empty categories
+          // but handle it gracefully by showing the "all cards empty" popup
+          setShowAllCardsEmptyPopup(true);
+        }
       }
     },
-    [router]
+    [router, selectCategoryById, drawRandomQuestion]
   );
 
   /**
@@ -154,7 +164,7 @@ export default function CategoryScreen() {
   }
 
   return (
-    <GestureHandlerRootView style={styles.container}>
+    <View style={styles.container}>
       {/* Header */}
       <GameHeader
         onMenuPress={() => setMenuVisible(true)}
@@ -162,12 +172,13 @@ export default function CategoryScreen() {
         discardCount={discardCount}
       />
 
-      {/* Main content with dice */}
+      {/* Main content with dice - auto-rolls on mount */}
       <View style={styles.content}>
         <DiceRoller
           onRollComplete={handleRollComplete}
           getAvailableOutcomes={getAvailableOutcomes}
           onAllCategoriesEmpty={handleAllCategoriesEmpty}
+          autoRoll={true}
         />
       </View>
 
@@ -201,7 +212,7 @@ export default function CategoryScreen() {
           },
         ]}
       />
-    </GestureHandlerRootView>
+    </View>
   );
 }
 

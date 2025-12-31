@@ -1,10 +1,15 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Dimensions, StyleSheet, Text, View } from "react-native";
-import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import {
+  Dimensions,
+  InteractionManager,
+  Platform,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import Animated, {
   Easing,
   interpolate,
-  runOnJS,
   useAnimatedStyle,
   useSharedValue,
   withSequence,
@@ -56,46 +61,56 @@ interface DiceRollerProps {
   /** Called when user tries to roll but all categories are empty */
   onAllCategoriesEmpty?: () => void;
   disabled?: boolean;
+  /** If true, automatically start rolling on mount. Default: true */
+  autoRoll?: boolean;
 }
+
+/**
+ * Get a random color index for flicker effect
+ */
+const getRandomColorIndex = (): number => {
+  return Math.floor(Math.random() * ALL_OUTCOMES.length);
+};
 
 /**
  * DiceRoller Component
  *
- * An animated dice that responds to swipe-up gestures.
+ * An animated dice that automatically rolls on mount.
  * Features:
  * - 2.5s tumbling animation with rotation + wobble + scale
- * - Flickering face colors during roll
+ * - Flickering face colors during roll (UI thread based)
  * - 1.0s pause on final face before callback
  * - Only lands on available outcomes (skips empty categories)
+ * - Auto-rolls on mount (no swipe required)
+ * - Cannot be skipped or interrupted
+ * - Optimized for smooth first-frame animation start
  */
 export const DiceRoller: React.FC<DiceRollerProps> = ({
   onRollComplete,
   getAvailableOutcomes,
   onAllCategoriesEmpty,
   disabled = false,
+  autoRoll = true,
 }) => {
-  // Animation shared values
+  // Animation shared values (all on UI thread)
   const rotateZ = useSharedValue(0);
   const rotateX = useSharedValue(0);
   const rotateY = useSharedValue(0);
   const scale = useSharedValue(1);
   const shadowRadius = useSharedValue(12);
 
-  /**
-   * Get a random face color for initial display (purely visual, doesn't affect outcome)
-   */
-  const getRandomInitialColor = (): string => {
-    const randomOutcome = ALL_OUTCOMES[Math.floor(Math.random() * ALL_OUTCOMES.length)];
-    return FACE_COLORS[randomOutcome];
-  };
+  // Color index for flicker (shared value for UI thread color updates)
+  const colorIndex = useSharedValue(getRandomColorIndex());
 
-  // State
+  // State (minimal - only for text display)
   const [isRolling, setIsRolling] = useState(false);
-  const [currentFaceColor, setCurrentFaceColor] = useState(() => getRandomInitialColor());
-  const [finalOutcome, setFinalOutcome] = useState<DiceOutcome | null>(null);
 
-  // Refs for intervals
-  const flickerIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  // Refs for guards and outcome tracking
+  const hasRolledRef = useRef(false);
+  const finalOutcomeRef = useRef<DiceOutcome | null>(null);
+  const flickerIntervalRef = useRef<ReturnType<typeof setInterval> | null>(
+    null
+  );
 
   /**
    * Pick a random outcome from available outcomes only
@@ -108,24 +123,17 @@ export const DiceRoller: React.FC<DiceRollerProps> = ({
   }, [getAvailableOutcomes]);
 
   /**
-   * Pick a random face color for flickering (uses all colors for visual effect)
-   */
-  const pickRandomFaceColor = useCallback((): string => {
-    const randomOutcome = ALL_OUTCOMES[Math.floor(Math.random() * ALL_OUTCOMES.length)];
-    return FACE_COLORS[randomOutcome];
-  }, []);
-
-  /**
-   * Start the flicker effect - rapidly change face colors
+   * Start the flicker effect using setInterval
+   * Updates colorIndex shared value to keep animation on UI thread
    */
   const startFlicker = useCallback(() => {
     if (flickerIntervalRef.current) {
       clearInterval(flickerIntervalRef.current);
     }
     flickerIntervalRef.current = setInterval(() => {
-      setCurrentFaceColor(pickRandomFaceColor());
-    }, 80 + Math.random() * 40);
-  }, [pickRandomFaceColor]);
+      colorIndex.value = getRandomColorIndex();
+    }, 100);
+  }, [colorIndex]);
 
   /**
    * Stop the flicker effect
@@ -138,56 +146,29 @@ export const DiceRoller: React.FC<DiceRollerProps> = ({
   }, []);
 
   /**
-   * Handle roll completion after animations
+   * Handle roll completion after animations (called from JS thread)
    */
-  const handleRollEnd = useCallback(
-    (outcome: DiceOutcome) => {
-      stopFlicker();
-      setCurrentFaceColor(FACE_COLORS[outcome]);
+  const handleRollEnd = useCallback(() => {
+    const outcome = finalOutcomeRef.current;
+    if (!outcome) return;
 
-      // Wait 1.0s showing final face, then call callback
-      setTimeout(() => {
-        setIsRolling(false);
-        setFinalOutcome(null);
-        onRollComplete(outcome);
-      }, 1000);
-    },
-    [onRollComplete, stopFlicker]
-  );
+    stopFlicker();
+    // Set final color
+    colorIndex.value = ALL_OUTCOMES.indexOf(outcome);
+
+    // Wait 1.0s showing final face, then call callback
+    setTimeout(() => {
+      setIsRolling(false);
+      finalOutcomeRef.current = null;
+      onRollComplete(outcome);
+    }, 1000);
+  }, [onRollComplete, stopFlicker, colorIndex]);
 
   /**
-   * Trigger the roll animation
+   * Start the animation values (runs on UI thread)
+   * Separated from state updates to prevent first-frame lag
    */
-  const triggerRoll = useCallback(() => {
-    if (isRolling || disabled) return;
-
-    // Check if there are any available outcomes with cards
-    const available = getAvailableOutcomes();
-    
-    // If only choose-user and choose-opponent are available (all categories empty)
-    const categoryOutcomes = available.filter(
-      (o) => o !== "choose-user" && o !== "choose-opponent"
-    );
-    
-    if (categoryOutcomes.length === 0) {
-      // All colored categories are empty - trigger popup
-      onAllCategoriesEmpty?.();
-      return;
-    }
-
-    setIsRolling(true);
-
-    // Pick the final outcome from available outcomes
-    const outcome = pickRandomOutcome();
-    if (!outcome) {
-      setIsRolling(false);
-      onAllCategoriesEmpty?.();
-      return;
-    }
-
-    setFinalOutcome(outcome);
-    startFlicker();
-
+  const startAnimations = useCallback(() => {
     const ROLL_DURATION = 2500;
 
     // Rotate Z - fast spin
@@ -198,24 +179,66 @@ export const DiceRoller: React.FC<DiceRollerProps> = ({
 
     // Rotate X - wobble
     rotateX.value = withSequence(
-      withTiming(25, { duration: ROLL_DURATION * 0.15, easing: Easing.inOut(Easing.quad) }),
-      withTiming(-20, { duration: ROLL_DURATION * 0.15, easing: Easing.inOut(Easing.quad) }),
-      withTiming(15, { duration: ROLL_DURATION * 0.15, easing: Easing.inOut(Easing.quad) }),
-      withTiming(-12, { duration: ROLL_DURATION * 0.15, easing: Easing.inOut(Easing.quad) }),
-      withTiming(8, { duration: ROLL_DURATION * 0.15, easing: Easing.inOut(Easing.quad) }),
-      withTiming(-4, { duration: ROLL_DURATION * 0.125, easing: Easing.inOut(Easing.quad) }),
-      withTiming(0, { duration: ROLL_DURATION * 0.1, easing: Easing.out(Easing.quad) })
+      withTiming(25, {
+        duration: ROLL_DURATION * 0.15,
+        easing: Easing.inOut(Easing.quad),
+      }),
+      withTiming(-20, {
+        duration: ROLL_DURATION * 0.15,
+        easing: Easing.inOut(Easing.quad),
+      }),
+      withTiming(15, {
+        duration: ROLL_DURATION * 0.15,
+        easing: Easing.inOut(Easing.quad),
+      }),
+      withTiming(-12, {
+        duration: ROLL_DURATION * 0.15,
+        easing: Easing.inOut(Easing.quad),
+      }),
+      withTiming(8, {
+        duration: ROLL_DURATION * 0.15,
+        easing: Easing.inOut(Easing.quad),
+      }),
+      withTiming(-4, {
+        duration: ROLL_DURATION * 0.125,
+        easing: Easing.inOut(Easing.quad),
+      }),
+      withTiming(0, {
+        duration: ROLL_DURATION * 0.1,
+        easing: Easing.out(Easing.quad),
+      })
     );
 
     // Rotate Y - wobble
     rotateY.value = withSequence(
-      withTiming(-20, { duration: ROLL_DURATION * 0.12, easing: Easing.inOut(Easing.quad) }),
-      withTiming(18, { duration: ROLL_DURATION * 0.15, easing: Easing.inOut(Easing.quad) }),
-      withTiming(-14, { duration: ROLL_DURATION * 0.15, easing: Easing.inOut(Easing.quad) }),
-      withTiming(10, { duration: ROLL_DURATION * 0.15, easing: Easing.inOut(Easing.quad) }),
-      withTiming(-6, { duration: ROLL_DURATION * 0.15, easing: Easing.inOut(Easing.quad) }),
-      withTiming(3, { duration: ROLL_DURATION * 0.14, easing: Easing.inOut(Easing.quad) }),
-      withTiming(0, { duration: ROLL_DURATION * 0.14, easing: Easing.out(Easing.quad) })
+      withTiming(-20, {
+        duration: ROLL_DURATION * 0.12,
+        easing: Easing.inOut(Easing.quad),
+      }),
+      withTiming(18, {
+        duration: ROLL_DURATION * 0.15,
+        easing: Easing.inOut(Easing.quad),
+      }),
+      withTiming(-14, {
+        duration: ROLL_DURATION * 0.15,
+        easing: Easing.inOut(Easing.quad),
+      }),
+      withTiming(10, {
+        duration: ROLL_DURATION * 0.15,
+        easing: Easing.inOut(Easing.quad),
+      }),
+      withTiming(-6, {
+        duration: ROLL_DURATION * 0.15,
+        easing: Easing.inOut(Easing.quad),
+      }),
+      withTiming(3, {
+        duration: ROLL_DURATION * 0.14,
+        easing: Easing.inOut(Easing.quad),
+      }),
+      withTiming(0, {
+        duration: ROLL_DURATION * 0.14,
+        easing: Easing.out(Easing.quad),
+      })
     );
 
     // Scale bounce
@@ -231,43 +254,113 @@ export const DiceRoller: React.FC<DiceRollerProps> = ({
 
     // Shadow change
     shadowRadius.value = withSequence(
-      withTiming(20, { duration: ROLL_DURATION * 0.3, easing: Easing.out(Easing.quad) }),
-      withTiming(8, { duration: ROLL_DURATION * 0.4, easing: Easing.inOut(Easing.quad) }),
-      withTiming(12, { duration: ROLL_DURATION * 0.3, easing: Easing.out(Easing.quad) })
+      withTiming(20, {
+        duration: ROLL_DURATION * 0.3,
+        easing: Easing.out(Easing.quad),
+      }),
+      withTiming(8, {
+        duration: ROLL_DURATION * 0.4,
+        easing: Easing.inOut(Easing.quad),
+      }),
+      withTiming(12, {
+        duration: ROLL_DURATION * 0.3,
+        easing: Easing.out(Easing.quad),
+      })
     );
 
+    // Schedule roll end callback
     setTimeout(() => {
-      runOnJS(handleRollEnd)(outcome);
+      handleRollEnd();
     }, ROLL_DURATION);
+  }, [rotateZ, rotateX, rotateY, scale, shadowRadius, handleRollEnd]);
+
+  /**
+   * Trigger the roll animation
+   * Optimized to start animations immediately, defer state updates
+   */
+  const triggerRoll = useCallback(() => {
+    // Prevent multiple rolls (using ref check before setting)
+    if (finalOutcomeRef.current !== null || disabled) return;
+
+    // Check if there are any available outcomes with cards
+    const available = getAvailableOutcomes();
+
+    // If only choose-user and choose-opponent are available (all categories empty)
+    const categoryOutcomes = available.filter(
+      (o) => o !== "choose-user" && o !== "choose-opponent"
+    );
+
+    if (categoryOutcomes.length === 0) {
+      // All colored categories are empty - trigger popup
+      onAllCategoriesEmpty?.();
+      return;
+    }
+
+    // Pick the final outcome from available outcomes
+    const outcome = pickRandomOutcome();
+    if (!outcome) {
+      onAllCategoriesEmpty?.();
+      return;
+    }
+
+    // Store outcome in ref (no re-render)
+    finalOutcomeRef.current = outcome;
+
+    // Start animations IMMEDIATELY (before any state updates)
+    startAnimations();
+    startFlicker();
+
+    // Defer state update to next frame to avoid blocking animation start
+    requestAnimationFrame(() => {
+      setIsRolling(true);
+    });
   }, [
-    isRolling,
     disabled,
     getAvailableOutcomes,
     onAllCategoriesEmpty,
     pickRandomOutcome,
+    startAnimations,
     startFlicker,
-    rotateZ,
-    rotateX,
-    rotateY,
-    scale,
-    shadowRadius,
-    handleRollEnd,
   ]);
 
+  // Cleanup on unmount
   useEffect(() => {
     return () => {
       stopFlicker();
     };
   }, [stopFlicker]);
 
-  const panGesture = Gesture.Pan()
-    .onEnd((event) => {
-      if (event.translationY < -60 && event.velocityY < 0) {
-        runOnJS(triggerRoll)();
-      }
-    })
-    .enabled(!isRolling && !disabled);
+  // Auto-roll on mount (with guard to prevent double-rolls from useEffect re-runs)
+  // Uses double requestAnimationFrame to ensure layout/paint is complete
+  useEffect(() => {
+    if (autoRoll && !hasRolledRef.current && !disabled) {
+      // Set guard immediately to prevent re-triggers from fast re-renders
+      hasRolledRef.current = true;
 
+      // Wait for interactions to complete (navigation animations, etc.)
+      const startRollAfterPaint = () => {
+        // Double rAF ensures we're past the first paint
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            triggerRoll();
+          });
+        });
+      };
+
+      if (Platform.OS === "web") {
+        // On web, just use double rAF
+        startRollAfterPaint();
+      } else {
+        // On native, wait for navigation interactions to complete
+        const handle = InteractionManager.runAfterInteractions(() => {
+          startRollAfterPaint();
+        });
+        return () => handle.cancel();
+      }
+    }
+  }, [autoRoll, disabled, triggerRoll]);
+
+  // Animated style for dice body
   const animatedDiceStyle = useAnimatedStyle(() => {
     return {
       transform: [
@@ -282,38 +375,38 @@ export const DiceRoller: React.FC<DiceRollerProps> = ({
     };
   });
 
-  return (
-    <GestureDetector gesture={panGesture}>
-      <View style={styles.container}>
-        <Animated.View style={[styles.diceBody, animatedDiceStyle]}>
-          <View
-            style={[
-              styles.facePatch,
-              styles.facePatchCenter,
-              { backgroundColor: currentFaceColor },
-            ]}
-          />
-          <View
-            style={[
-              styles.facePatch,
-              styles.facePatchLeft,
-              { backgroundColor: currentFaceColor, opacity: 0.7 },
-            ]}
-          />
-          <View
-            style={[
-              styles.facePatch,
-              styles.facePatchRight,
-              { backgroundColor: currentFaceColor, opacity: 0.7 },
-            ]}
-          />
-        </Animated.View>
+  // Animated style for face color (uses colorIndex shared value)
+  const animatedFaceColor = useAnimatedStyle(() => {
+    const colors = [
+      FACE_COLORS.prylar,
+      FACE_COLORS.personer,
+      FACE_COLORS.underhallning,
+      FACE_COLORS.blandat,
+      FACE_COLORS["choose-user"],
+      FACE_COLORS["choose-opponent"],
+    ];
+    const index = Math.min(
+      Math.max(0, Math.round(colorIndex.value)),
+      colors.length - 1
+    );
+    return {
+      backgroundColor: colors[index],
+    };
+  });
 
-        <Text style={styles.instructionText}>
-          {isRolling ? "Kastar..." : "Svep upp för att\nkasta tärningen!"}
-        </Text>
-      </View>
-    </GestureDetector>
+  return (
+    <View style={styles.container}>
+      <Animated.View style={[styles.diceBody, animatedDiceStyle]}>
+        {/* Single centered color dot */}
+        <Animated.View
+          style={[styles.facePatch, styles.facePatchCenter, animatedFaceColor]}
+        />
+      </Animated.View>
+
+      {isRolling && (
+        <Text style={styles.instructionText}>Kastar tärningen...</Text>
+      )}
+    </View>
   );
 };
 
@@ -345,18 +438,6 @@ const styles = StyleSheet.create({
   facePatchCenter: {
     width: DICE_SIZE * 0.42,
     height: DICE_SIZE * 0.42,
-  },
-  facePatchLeft: {
-    width: DICE_SIZE * 0.22,
-    height: DICE_SIZE * 0.22,
-    left: DICE_SIZE * 0.08,
-    top: DICE_SIZE * 0.5 - DICE_SIZE * 0.11,
-  },
-  facePatchRight: {
-    width: DICE_SIZE * 0.22,
-    height: DICE_SIZE * 0.22,
-    right: DICE_SIZE * 0.08,
-    bottom: DICE_SIZE * 0.15,
   },
   instructionText: {
     marginTop: 40,
